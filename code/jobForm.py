@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, 
+                                QLineEdit, QCheckBox, QTextEdit, QPushButton)
+from PyQt5.QtWidgets import QButtonGroup
 
 class newJobForm(QWidget):
     def __init__(self, parent=None):

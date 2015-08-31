@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit
 
 class findJobWidget(QWidget):
-    def __init__(self):
+    def __init__(self, parent=None):
         QWidget.__init__(self)
         self.layout = QVBoxLayout()
         label = QLabel("Find Job")

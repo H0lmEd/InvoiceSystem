@@ -1,4 +1,5 @@
 import sys
+import os
 import sip
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -21,6 +22,7 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(self.buttons)
         
         #self.progressWidget = progressWidget()
+        iconFolder = os.path.join(os.path.dirname(__file__), os.pardir, "icons/")
 
         self.titleLayout = QHBoxLayout()
         horizLine = QFrame()
@@ -29,7 +31,7 @@ class mainInterface(QWidget):
         homeButton = QToolButton(self)
         homeButton.setToolButtonStyle(2) #Text beside icon
         homeButton.setText("Back")
-        homeButton.setIcon(QIcon(':/icons/back.png'))
+        homeButton.setIcon(QIcon(iconFolder + 'back.png'))
         homeButton.setIconSize(QSize(12, 12))
         homeButton.clicked.connect(self.goHome)
 
@@ -46,11 +48,11 @@ class mainInterface(QWidget):
         #global progressWidget
         #progressWidget = customProgressWidget()
         #self.titleLayout.addWidget(progressWidget)
-        jobForm = newJobForm
+        jobForm = newJobForm(self)
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
     def findJob(self):
-        searchWidget = findJobWidget
+        searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
         self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
