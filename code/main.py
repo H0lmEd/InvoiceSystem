@@ -34,10 +34,12 @@ class mainInterface(QWidget):
         homeButton.setIcon(QIcon(iconFolder + 'back.png'))
         homeButton.setIconSize(QSize(12, 12))
         homeButton.clicked.connect(self.goHome)
-
+        self.statusBar = QStatusBar(self)
+        self.statusBar.showMessage("YES")
         mainLayout.addLayout(self.titleLayout)
         mainLayout.addWidget(horizLine)
         mainLayout.addWidget(self.centralWidget)
+        mainLayout.addWidget(self.statusBar)
         mainLayout.addWidget(homeButton)
         self.setLayout(mainLayout)
         self.setGeometry(390, 365, 390, 365)
@@ -49,6 +51,7 @@ class mainInterface(QWidget):
         #progressWidget = customProgressWidget()
         #self.titleLayout.addWidget(progressWidget)
         jobForm = newJobForm(self)
+        jobForm.nextButton.clicked.connect(jobForm.errorChecking)
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
     def findJob(self):
