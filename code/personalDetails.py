@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox
-import urllib
-import urllib2
-import json
+import requests
 
 
 class custDetailForm(QWidget):
@@ -11,8 +9,8 @@ class custDetailForm(QWidget):
         super(custDetailForm, self).__init__(parent)
         layout = QFormLayout()
         def pcLookup():
-            url = "https://pcls1.craftyclicks.co.uk/json/"
-                
+            data = requests.get("http://api.postcodes.io/postcodes/"+"S403LQ").text
+            print (data)
         #WIDGETS
         nameLabel = QLabel('Full Name:')
         self.nameEdit = QLineEdit(self)

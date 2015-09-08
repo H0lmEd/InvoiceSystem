@@ -35,26 +35,73 @@ class mainInterface(QWidget):
         homeButton.setIcon(QIcon(iconFolder + 'back.png'))
         homeButton.setIconSize(QSize(12, 12))
         homeButton.clicked.connect(self.goHome)
-
-        nextButton = QPushButton("Next")
-        nextButton.clicked.connect(self.personalDeets)
+        self.statusBar = QStatusBar(self)
+        self.statusBar.showMessage("Stat")
 
         mainLayout.addLayout(self.titleLayout)
         mainLayout.addWidget(horizLine)
         mainLayout.addWidget(self.centralWidget)
+        mainLayout.addWidget(self.statusBar)
         mainLayout.addWidget(homeButton)
-        mainLayout.addWidget(nextButton)
         self.setLayout(mainLayout)
         self.setGeometry(390, 365, 390, 365)
     #def hzLine(self):
         #line = QFrame()
         #lane.setFrame
     def newJob(self):
+        def errorChecking():
+            def writeToFile():
+                custItems = jobForm.itemEdit.text()
+                if jobForm.psuButtonGroup.checkedId == -2:
+                    custPsu = "Yes"
+                elif jobForm.psuButtonGroup.checkedId == -3:
+                    custPsu = "No"
+                else:
+                    custPsu = "N/A"
+                custProblem = jobForm.problemEdit.toPlainText()
+                if jobForm.importantDataGrp.checkedId() == -1:
+                    custData = "Yes"
+                else:
+                    custData = "No"
+                if jobForm.dataBackupGrp.checkedId() == -1:
+                    custBackup = "Yes"
+                else:
+                    custBackup = "No"
+                fileSaveTo = open("Example.txt", "w")
+                fileSaveTo.write("Items: "+custItems)
+                fileSaveTo.write("\nPSU: "+custPsu)
+                fileSaveTo.write("\nProblem: "+custProblem)
+                fileSaveTo.write("\nData: "+custData)
+                fileSaveTo.write("\nBackup: "+custBackup)
+                self.statusBar.showMessage("job Details saved")
+                self.personalDeets()
+            statusText = "No Eeorrs"
+
+            if jobForm.itemEdit.text() == "":
+                statusText = "Error: Enter Items"
+                pass
+            elif jobForm.psuButtonGroup.checkedId() == -1:
+                statusText = "Error: PSU>?"
+                pass
+            elif jobForm.problemEdit.toPlainText() == "":
+                statusText = "Error: no prob?"
+                pass
+            elif jobForm.importantDataGrp.checkedId() == -1:
+                statusText = "Error: DAta?!"
+                pass
+            elif jobForm.dataBackupGrp.checkedId() == -1:
+                statusText = "Error: Backup?"
+                pass
+            else:
+                writeToFile()
+
+            self.statusBar.showMessage(statusText)
         #global progressWidget
         #progressWidget = customProgressWidget()
         #self.titleLayout.addWidget(progressWidget)
         jobForm = newJobForm(self)
-        jobForm.nextButton.clicked.connect(jobForm.errorChecking)
+        jobForm.nextButton.clicked.connect(errorChecking)
+        
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
     def findJob(self):

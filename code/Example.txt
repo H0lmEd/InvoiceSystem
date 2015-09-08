@@ -1,5 +1,5 @@
-Items: Dell Laptop (Blue)
-PSU: No
-Problem: Blue Screen on start-up
+Items: jkasdf
+PSU: N/A
+Problem: asdfadsfadsf
 Data: No
-backup: No
+Backup: No
