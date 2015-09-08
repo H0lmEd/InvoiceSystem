@@ -1,0 +1,5 @@
+Items: Dell Laptop (Blue)
+PSU: No
+Problem: Blue Screen on start-up
+Data: No
+backup: No

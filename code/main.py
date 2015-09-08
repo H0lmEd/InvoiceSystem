@@ -7,6 +7,7 @@ from PyQt5.QtGui import *
 from findJob import findJobWidget
 from jobForm import newJobForm
 from buttons import buttonsWidget
+from personalDetails import custDetailForm
 #from PyKde4.kdeui import KIcon
 
 
@@ -34,13 +35,15 @@ class mainInterface(QWidget):
         homeButton.setIcon(QIcon(iconFolder + 'back.png'))
         homeButton.setIconSize(QSize(12, 12))
         homeButton.clicked.connect(self.goHome)
-        self.statusBar = QStatusBar(self)
-        self.statusBar.showMessage("YES")
+
+        nextButton = QPushButton("Next")
+        nextButton.clicked.connect(self.personalDeets)
+
         mainLayout.addLayout(self.titleLayout)
         mainLayout.addWidget(horizLine)
         mainLayout.addWidget(self.centralWidget)
-        mainLayout.addWidget(self.statusBar)
         mainLayout.addWidget(homeButton)
+        mainLayout.addWidget(nextButton)
         self.setLayout(mainLayout)
         self.setGeometry(390, 365, 390, 365)
     #def hzLine(self):
@@ -71,7 +74,10 @@ class mainInterface(QWidget):
             sip.delete(self.progressWidget) #Steals C++ delete function
             self.progressWidget = None
         self.centralWidget.setCurrentWidget(self.buttons)
-        
+    def personalDeets(self):
+        detailsForm = custDetailForm(self)
+        self.centralWidget.addWidget(detailsForm)
+        self.centralWidget.setCurrentWidget(detailsForm)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -1,12 +1,34 @@
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, 
                                 QLineEdit, QCheckBox, QTextEdit, QPushButton)
-from PyQt5.QtWidgets import QButtonGroup
+from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox
+
+
+# TO BE ADDED HERE:
+# - Error dialogs prettier
+# - Number Generator
+# - Save file as number
+# - Important Data cancel check no box
+# - Prettier
+# - Add stuff to file to section off job details
 
 
 class newJobForm(QWidget):
     def __init__(self, parent=None):
         super(newJobForm, self).__init__(parent)
         olayout = QFormLayout()
+        def importantDataDialog():
+            data, ok = QInputDialog.getText(self, "Important Data",
+                    "Important Data:")
+
+            if ok:
+                self.importData = str(data)
+            else:
+                errorMsg = QMessageBox()
+                errorMsg.setText("Error")
+                errorMsg.setInformativeText("You need to enter what important data is kept on the system")
+                errorMsg.exec_()
+        
+        
         #Widgets 
 	
 	#jobTitle = QLabel("<u>Job Details</u>")
@@ -33,18 +55,19 @@ class newJobForm(QWidget):
         self.importantDataBox = QHBoxLayout()
         self.importantDataBox.addWidget(importantDataCheckYes)
         self.importantDataBox.addWidget(importantDataCheckNo)
-        
+       
+        importantDataCheckYes.clicked.connect(importantDataDialog)
         dataBackupLabel = QLabel('Data backed up?')
         dataBackupCheckYes = QCheckBox('Yes', self)
-        dataBackupCheckNo = QCheckBox('Yes', self)
+        dataBackupCheckNo = QCheckBox('No', self)
         self.dataBackupBox = QHBoxLayout()
         self.dataBackupBox.addWidget(dataBackupCheckYes)
         self.dataBackupBox.addWidget(dataBackupCheckNo)
         
         # Back up check boxes set up
-        dataBackupGrp = QButtonGroup(self)
-        dataBackupGrp.addButton(dataBackupCheckYes)
-        dataBackupGrp.addButton(dataBackupCheckNo)
+        self.dataBackupGrp = QButtonGroup(self)
+        self.dataBackupGrp.addButton(dataBackupCheckYes)
+        self.dataBackupGrp.addButton(dataBackupCheckNo)
         
         # Important Data check Boxes Set Up
         self.importantDataGrp = QButtonGroup(self)
@@ -65,42 +88,46 @@ class newJobForm(QWidget):
         olayout.addRow(dataBackupLabel, self.dataBackupBox)
         olayout.addRow(self.nextButton)
         self.setLayout(olayout)
+    
     def errorChecking(self):
         def writeToFile():
             custItems = self.itemEdit.text()
-            if self.psuButtonGroup.checkedButton == 1:
+            if self.psuButtonGroup.checkedId == -2:
                 custPsu = "Yes"
-            else:
+            elif self.psuButtonGroup.checkedId() == -3:
                 custPsu = "No"
-            custProblem = self.problemEdit.text()
-            if self.importantDataGrp.checkedButton == 1:
+            else:
+                custPsu = "N/A"
+            custProblem = self.problemEdit.toPlainText()
+            if self.importantDataGrp.checkedId() == -1:
                 custData = "Yes"
             else:
                 custData = "No"
-            if self.dataBackupBox.checkedButton == 1:
+            if self.dataBackupGrp.checkedId() == -1:
                 custBackup = "Yes"
             else:
                 custBackup = "No"
-            fileSaveTo = open("randNum.txt", "w")
-            fileSaveTo.write(custItems)
-            fileSaveTo.write(custPsu)
-            fileSaveTo.write(custProblem)
-            fileSaveTo.write(custData)
-            fileSaveTo.write(custBackup)
+            fileSaveTo = open("Example.txt", "w")
+            fileSaveTo.write("Items: "+custItems)
+            fileSaveTo.write("\nPSU: "+custPsu)
+            fileSaveTo.write("\nProblem: "+custProblem)
+            fileSaveTo.write("\nData: "+custData)
+            fileSaveTo.write("\nbackup: "+custBackup)
         statusText = "No Eeorrs"
+        print(self.psuButtonGroup.checkedId())
         if self.itemEdit.text() == "":
             statusText = "Error: Enter items"
             pass
-        elif self.psuButtonGroup.checkedButton == 0:
+        elif self.psuButtonGroup.checkedId() == -1:
             statusText = "Error: PSU??"
             pass
-        elif self.problemEdit.text() == "":
+        elif self.problemEdit.toPlainText() == "":
             statusText = "Error: No Prob?"
             pass
-        elif self.importantDataGrp.checkedButton == 0:
+        elif self.importantDataGrp.checkedId() == -1:
             statusText = "Error: DATA?!!"
             pass
-        elif self.dataBackupBox.checkedButton == 0:
+        elif self.dataBackupGrp.checkedId() == -1:
             statusText = "Error: BACKup?"
             pass
         else:
@@ -108,6 +135,8 @@ class newJobForm(QWidget):
             writeToFile()
         #statBar = sBar(self)
         #statBar.showMessage(statusText)
-
+        statusMsg = QMessageBox()
+        statusMsg.setText(statusText)
+        statusMsg.exec_()
         print ("Items:", self.itemEdit.text())
         
