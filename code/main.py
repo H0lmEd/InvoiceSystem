@@ -37,11 +37,13 @@ class mainInterface(QWidget):
         homeButton.clicked.connect(self.goHome)
         self.statusBar = QStatusBar(self)
         self.statusBar.showMessage("Stat")
-
+        jobButton = QPushButton("POST")
+        jobButton.clicked.connect(self.personalDeets)
         mainLayout.addLayout(self.titleLayout)
         mainLayout.addWidget(horizLine)
         mainLayout.addWidget(self.centralWidget)
         mainLayout.addWidget(self.statusBar)
+        mainLayout.addWidget(jobButton)
         mainLayout.addWidget(homeButton)
         self.setLayout(mainLayout)
         self.setGeometry(390, 365, 390, 365)
@@ -67,7 +69,7 @@ class mainInterface(QWidget):
                     custBackup = "Yes"
                 else:
                     custBackup = "No"
-                fileSaveTo = open("Example.txt", "w")
+                fileSaveTo = open("."+str(jobForm.jobNum), "w")
                 fileSaveTo.write("Items: "+custItems)
                 fileSaveTo.write("\nPSU: "+custPsu)
                 fileSaveTo.write("\nProblem: "+custProblem)

@@ -28,12 +28,24 @@ class newJobForm(QWidget):
                 errorMsg.setInformativeText("You need to enter what important data is kept on the system")
                 errorMsg.exec_()
         
-        
+        def jobNumber():
+            jobNoFile = open(".jobNum", "r+")
+            self.jobNum = int(jobNoFile.read())
+            newJobNum = self.jobNum + 1
+            jobNoFile.seek(0)
+            jobNoFile.truncate()
+            jobNoFile.write(str(newJobNum))
+            return self.jobNum
         #Widgets 
-	
+        jobNoLabel = QLabel('Job Number:')
+        jobNoEdit = QLineEdit(self)
+        jobNoEdit.setReadOnly(True)
+        jobNoEdit.setPlaceholderText(str(jobNumber()))
 	#jobTitle = QLabel("<u>Job Details</u>")
         itemLabel = QLabel('Items:')
         self.itemEdit = QLineEdit(self)
+        self.itemEdit.setClearButtonEnabled(True)
+        self.itemEdit.setFrame(False)
         
         psuLabel = QLabel('Power Supply?') 
         self.psuButtonGroup = QButtonGroup(self)
@@ -81,6 +93,7 @@ class newJobForm(QWidget):
         self.psuButtonGroup.addButton(psuNA)
         # if psuButtonGroup.checkedButton == 0, none clicked
         self.nextButton = QPushButton("Next", self)
+        olayout.addRow(jobNoLabel, jobNoEdit)
         olayout.addRow(itemLabel, self.itemEdit)
         olayout.addRow(psuLabel, psuBox)
         olayout.addRow(problemLabel, self.problemEdit)

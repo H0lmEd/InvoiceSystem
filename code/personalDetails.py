@@ -1,15 +1,24 @@
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox
-import requests
-
-
+import json
+import urllib.request
 class custDetailForm(QWidget):
     def __init__(self, parent=None):
         super(custDetailForm, self).__init__(parent)
         layout = QFormLayout()
         def pcLookup():
-            data = requests.get("http://api.postcodes.io/postcodes/"+"S403LQ").text
+            try:
+                response = urllib.request.Request('http://uk-postcodes.com/postcode/s403lq.json')
+                print(response)
+                response.add_header("APIKEY")
+                rawData = urlopen(response)
+                string = rawData.read().decode('utf-8')
+                data = json.loads(string)
+                
+            except ConnectionError as d:
+                print (d)
+                print ("error")
             print (data)
         #WIDGETS
         nameLabel = QLabel('Full Name:')
