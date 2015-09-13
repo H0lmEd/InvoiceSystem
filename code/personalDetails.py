@@ -2,19 +2,27 @@ from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdi
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox
 import json
-import urllib.request
+import urllib
+import requests
 class custDetailForm(QWidget):
     def __init__(self, parent=None):
         super(custDetailForm, self).__init__(parent)
         layout = QFormLayout()
         def pcLookup():
             try:
-                response = urllib.request.Request('http://uk-postcodes.com/postcode/s403lq.json')
+                url = 'https://api.getaddress.io/v2/uk/S403LQ/3'
+                apiKey = 'qcvy-u9WH02l9QCKJclAFA1568'
+                payload = {'api_key': apiKey}
+                req = urllib.request.Request(url + urllib.parse.urlencode(payload))
+                res = urllib.request.urlopen(req)
+                response = json.load(res.read())
                 print(response)
-                response.add_header("APIKEY")
-                rawData = urlopen(response)
-                string = rawData.read().decode('utf-8')
-                data = json.loads(string)
+                #headr = {'apikey': 'qcvy-u9WH02l9QCKJclAFA1568'}
+                #response.add_header("apikey","qcvy-u9WH02l9QCKJclAFA1568")
+                #rawData = urllib.request.urlopen(response)
+                #string = rawData.read().decode('utf-8')
+                data = response.json()
+                print(data)
                 
             except ConnectionError as d:
                 print (d)
