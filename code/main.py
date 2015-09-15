@@ -124,7 +124,23 @@ class mainInterface(QWidget):
             self.progressWidget = None
         self.centralWidget.setCurrentWidget(self.buttons)
     def personalDeets(self):
+        def errorChecking():
+            def writeToFile():
+                pass
+            if detailsForm.nameEdit.text() == "":
+                statusText = "Error: No name"
+                pass
+            elif detailsForm.addrEdit.text() == "":
+                statusText = "Error: No Address"
+                pass
+            elif detailsForm.pcEdit.text() == "":
+                statusText = "Error: No Postcode"
+                pass
+            else:
+                writeToFile()
         detailsForm = custDetailForm(self)
+        detailsForm.nextButton.clicked.connect(errorChecking)
+        
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
 
