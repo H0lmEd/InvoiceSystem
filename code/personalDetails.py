@@ -1,24 +1,23 @@
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize,pyqtSignal
 import json
 import urllib
 import requests
-
-class ButtonLineEdit(QtGui.QLineEdit):
-    buttonClicked = QtCore.pyqtSignal(bool)
+class ButtonLineEdit(QLineEdit):
+    buttonClicked = pyqtSignal(bool)
 
     def __init__(self, icon_file, parent=None):
         super(ButtonLineEdit, self).__init__(parent)
 
-        self.button = QtGui.QToolButton(self)
-        self.button.setIcon(QtGui.QIcon(icon_file))
+        self.button = QToolButton(self)
+        self.button.setIcon(QIcon(icon_file))
         self.button.setStyleSheet('border: 0px; padding: 0px;')
-        self.button.setCursor(QtCore.Qt.ArrowCursor)
+        self.button.setCursor(Qt.ArrowCursor)
         self.button.clicked.connect(self.buttonClicked.emit)
 
-        frameWidth = self.style().pixelMetric(QtGui.QStyle.PM_DefaultFrameWidth)
+        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
         buttonSize = self.button.sizeHint()
 
         self.setStyleSheet('QLineEdit {padding-right: %dpx; }' % (buttonSize.width() + frameWidth + 1))
@@ -83,6 +82,7 @@ class custDetailForm(QWidget):
                 
                 reply = QMessageBox.critical(self, "Error", 
                         "Check your info and try again", QMessageBox.Ok)
+            
         #WIDGETS
         instr = QLabel("""Enter your postcode and click \"Look Up\" to populate the 
                 \"Home Address\" field with your address automatically""")
@@ -91,10 +91,11 @@ class custDetailForm(QWidget):
         
         addrLabel = QLabel('Home Address:')
         self.addrLineOne = QLineEdit(self)
-        self.addrLineOne.setPlaceholderText("123 New Street")
+        self.addrLineOne.setReadOnly(True)
 
         self.addrLineTwo = QLineEdit(self)
-        self.addrLineTwo.setPlaceholderText("Chesterfield")
+        self.addrLineTwo.setReadOnly(True)
+        self.addrLineTwo.setFrame(True)
         addrBox = QVBoxLayout()
         addrBox.addWidget(self.addrLineOne)
         addrBox.addWidget(self.addrLineTwo)
@@ -112,11 +113,16 @@ class custDetailForm(QWidget):
 
         layout.addRow(instr)
         layout.addRow(nameLabel, self.nameEdit)
-        layout.addRow(addrLabel, addrBox)
         layout.addRow(pcLabel, pcBox)
+        layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
         self.setLayout(layout)
     def notTheAddress(self):
         instructions = QMessageBox.information(self, 'Info',
                 "Enter the customer's address manually")
-        self.addrEdit.setPlaceHolderText("3 New Street\nChesterfield")
+        self.addrLineOne.clear()
+        self.addrLineTwo.clear()
+        self.addrLineOne.setPlaceholderText("3 New Street")
+        self.addrLineTwo.setPlaceholderText("Chesterfield")
+        self.addrLineOne.setReadOnly(False)
+        self.addrLineTwo.setReadOnly(False)

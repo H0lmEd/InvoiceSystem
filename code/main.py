@@ -69,14 +69,15 @@ class mainInterface(QWidget):
                     custBackup = "Yes"
                 else:
                     custBackup = "No"
-                fileSaveTo = open("."+str(jobForm.jobNum), "w")
-                fileSaveTo.write("Items: "+custItems)
-                fileSaveTo.write("\nPSU: "+custPsu)
-                fileSaveTo.write("\nProblem: "+custProblem)
-                fileSaveTo.write("\nData: "+custData)
-                fileSaveTo.write("\nBackup: "+custBackup)
+                fileSaveTo = open("."+str(jobForm.jobNum), "a")
+                fileSaveTo.write("JOBDETAILS")
+                fileSaveTo.write("\n"+custItems)
+                fileSaveTo.write("\n"+custPsu)
+                fileSaveTo.write("\n"+custProblem)
+                fileSaveTo.write("\n"+custData)
+                fileSaveTo.write("\n"+custBackup)
                 self.statusBar.showMessage("job Details saved")
-                self.personalDeets()
+                self.personalDeets(jobForm.jobNum)
             statusText = "No Eeorrs"
 
             if jobForm.itemEdit.text() == "":
@@ -123,14 +124,31 @@ class mainInterface(QWidget):
             sip.delete(self.progressWidget) #Steals C++ delete function
             self.progressWidget = None
         self.centralWidget.setCurrentWidget(self.buttons)
-    def personalDeets(self):
+    def personalDeets(self, jobNum):
+        print("Job No:",jobNum)
         def errorChecking():
             def writeToFile():
-                pass
+                custName = detailsForm.nameEdit.text()
+                custAddrOne = detailsForm.addrLineOne.text()
+                custAddrTwo = detailsForm.addrLineTwo.text()
+                custPC = detailsForm.pcEdit.text()
+
+                fileSaveTo = open("."+str(jobNum), "a")
+                fileSaveTo.write("PERSONALDETAILS\n"+custName)
+                fileSaveTo.write('\n'+custAddrOne)
+                fileSaveTo.write('\n'+custAddrTwo)
+                fileSaveTo.write('\n'+custPC)
+                fileSaveTo.close()
+                self.statusBar.showMessage("Job Details Saved")
+                
+            statusText = "NO Errors"
             if detailsForm.nameEdit.text() == "":
                 statusText = "Error: No name"
                 pass
-            elif detailsForm.addrEdit.text() == "":
+            elif detailsForm.addrLineOne.text() == "":
+                statusText = "Error: No Address"
+                pass
+            elif detailsForm.addrLineTwo.text() == "":
                 statusText = "Error: No Address"
                 pass
             elif detailsForm.pcEdit.text() == "":
@@ -138,6 +156,8 @@ class mainInterface(QWidget):
                 pass
             else:
                 writeToFile()
+            
+            self.statusBar.showMessage(statusText)
         detailsForm = custDetailForm(self)
         detailsForm.nextButton.clicked.connect(errorChecking)
         
