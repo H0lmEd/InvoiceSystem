@@ -1,8 +1,12 @@
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
-from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout
+from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle
 from PyQt5.QtCore import QSize,pyqtSignal
+from PyQt5.QtGui import QIcon
 import json
+import PyQt5.QtGui
+import PyQt5.QtCore
+import PyQt5.QtWidgets
 import urllib
 import requests
 class ButtonLineEdit(QLineEdit):
@@ -13,11 +17,11 @@ class ButtonLineEdit(QLineEdit):
 
         self.button = QToolButton(self)
         self.button.setIcon(QIcon(icon_file))
-        self.button.setStyleSheet('border: 0px; padding: 0px;')
-        self.button.setCursor(Qt.ArrowCursor)
+        self.button.setStyleSheet('border: 0px; padding: 0px;') #No Padding
+        #self.button.setCursor(ArrowCursor)
         self.button.clicked.connect(self.buttonClicked.emit)
 
-        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)# Set to label length
         buttonSize = self.button.sizeHint()
 
         self.setStyleSheet('QLineEdit {padding-right: %dpx; }' % (buttonSize.width() + frameWidth + 1))
@@ -26,12 +30,13 @@ class ButtonLineEdit(QLineEdit):
 
     def resizeEvent(self, event):
         buttonSize = self.button.sizeHint()
-        frameWidth = self.style().pixelMetric(QtGui.QStyle.PM_DefaultFrameWidth)
+        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
         self.button.move(self.rect().right() - frameWidth - buttonSize.width(),
                          (self.rect().bottom() - buttonSize.height() + 1)/2)
         super(ButtonLineEdit, self).resizeEvent(event)
 
-
+def buttonClicked():
+    print("ButtonClicked")
 
 class custDetailForm(QWidget):
     def __init__(self, parent=None):
@@ -108,6 +113,10 @@ class custDetailForm(QWidget):
         pcBox.addWidget(self.pcEdit)
         pcBox.addWidget(pcBtn)
         self.nextButton = QPushButton("Next")
+        testEdit = ButtonLineEdit('test.png')
+        testEdit.buttonClicked.connect(buttonClicked)
+
+
 
 
 
@@ -116,6 +125,7 @@ class custDetailForm(QWidget):
         layout.addRow(pcLabel, pcBox)
         layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
+        layout.addRow(testEdit)
         self.setLayout(layout)
     def notTheAddress(self):
         instructions = QMessageBox.information(self, 'Info',

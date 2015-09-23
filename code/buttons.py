@@ -18,12 +18,19 @@ class buttonsWidget(QWidget):
         self.newJobButton.setIconSize(QSize(64, 64))
         print("PAth", iconFolder)
 
-        self.findJobButton = QToolButton(self)
-        self.findJobButton.setToolButtonStyle(3) #text below icon
-        self.findJobButton.setText("Find a Job")
-        self.findJobButton.setIcon(QIcon(iconFolder+'find.png'))
-        self.findJobButton.setIconSize(QSize(64, 64))
+        self.editJobButton = QToolButton(self)
+        self.editJobButton.setToolButtonStyle(3) #text below icon
+        self.editJobButton.setText("View/Edit a Job")
+        self.editJobButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.editJobButton.setIconSize(QSize(64, 64))
+
+        self.addToJobButton = QToolButton(self)
+        self.addToJobButton.setToolButtonStyle(3)
+        self.addToJobButton.setText("Add Job Progress")
+        self.addToJobButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.addToJobButton.setIconSize(QSize(64, 64))
 
         layout.addWidget(self.newJobButton)
-        layout.addWidget(self.findJobButton)
+        layout.addWidget(self.editJobButton)
+        layout.addWidget(self.addToJobButton)
         self.setLayout(layout)

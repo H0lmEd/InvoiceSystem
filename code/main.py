@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from findJob import findJobWidget
-from jobForm import newJobForm
 from buttons import buttonsWidget
+from jobDisplay import jobDisplayWidget
+
 from personalDetails import custDetailForm
 #from PyKde4.kdeui import KIcon
 
@@ -19,7 +20,8 @@ class mainInterface(QWidget):
 
         self.buttons = buttonsWidget(self)
         self.buttons.newJobButton.clicked.connect(self.newJob)
-        self.buttons.findJobButton.clicked.connect(self.findJob)
+        self.buttons.editJobButton.clicked.connect(self.editJob)
+        self.buttons.addToJobButton.clicked.connect(self.addToJob)
         self.centralWidget.addWidget(self.buttons)
         
         #self.progressWidget = progressWidget()
@@ -51,6 +53,7 @@ class mainInterface(QWidget):
         #line = QFrame()
         #lane.setFrame
     def newJob(self):
+
         def errorChecking():
             def writeToFile():
                 custItems = jobForm.itemEdit.text()
@@ -69,7 +72,7 @@ class mainInterface(QWidget):
                     custBackup = "Yes"
                 else:
                     custBackup = "No"
-                fileSaveTo = open("."+str(jobForm.jobNum), "a")
+                fileSaveTo = open("."+str(jobForm.jobNumber), "a")
                 fileSaveTo.write("JOBDETAILS")
                 fileSaveTo.write("\n"+custItems)
                 fileSaveTo.write("\n"+custPsu)
@@ -77,7 +80,7 @@ class mainInterface(QWidget):
                 fileSaveTo.write("\n"+custData)
                 fileSaveTo.write("\n"+custBackup)
                 self.statusBar.showMessage("job Details saved")
-                self.personalDeets(jobForm.jobNum)
+                self.personalDeets(jobForm.jobNumber)
             statusText = "No Eeorrs"
 
             if jobForm.itemEdit.text() == "":
@@ -102,17 +105,30 @@ class mainInterface(QWidget):
         #global progressWidget
         #progressWidget = customProgressWidget()
         #self.titleLayout.addWidget(progressWidget)
-        jobForm = newJobForm(self)
+        def jobNumberGenerator():
+            jobNoFile = open('.jobNum', 'r+')
+            self.jobNum = int(jobNoFile.read())
+            newJobNum = self.jobNum + 1
+            jobNoFile.seek(0)
+            jobNoFile.truncate()
+            jobNoFile.write(str(newJobNum))
+            return self.jobNum
+
+        jobForm = jobDisplayWidget(jobNumberGenerator())
         jobForm.nextButton.clicked.connect(errorChecking)
+        jobForm.importantDataGrp.buttonClicked.connect(jobForm.importantDataChecked)
         
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
-    def findJob(self):
+    def editJob(self):
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
         self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
         self.centralWidget.setCurrentWidget(searchWidget)
+        
+    def addToJob(self):
+        pass
     def goHome(self):
         titleWidget = self.centralWidget.currentWidget()
         if "findJob" in str(titleWidget):
@@ -134,7 +150,7 @@ class mainInterface(QWidget):
                 custPC = detailsForm.pcEdit.text()
 
                 fileSaveTo = open("."+str(jobNum), "a")
-                fileSaveTo.write("PERSONALDETAILS\n"+custName)
+                fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
                 fileSaveTo.write('\n'+custAddrOne)
                 fileSaveTo.write('\n'+custAddrTwo)
                 fileSaveTo.write('\n'+custPC)
