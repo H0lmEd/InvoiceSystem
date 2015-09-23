@@ -14,7 +14,7 @@ class buttonsWidget(QWidget):
         self.newJobButton.setToolButtonStyle(3) #text below icon
         self.newJobButton.setText("New Job")
         self.newJobButton.setIcon(QIcon(iconFolder+'new.png'))
-        
+        self.newJobButton.setAutoRaise(True)
         self.newJobButton.setIconSize(QSize(64, 64))
         print("PAth", iconFolder)
 
@@ -22,10 +22,12 @@ class buttonsWidget(QWidget):
         self.editJobButton.setToolButtonStyle(3) #text below icon
         self.editJobButton.setText("View/Edit a Job")
         self.editJobButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.editJobButton.setAutoRaise(True)
         self.editJobButton.setIconSize(QSize(64, 64))
 
         self.addToJobButton = QToolButton(self)
-        self.addToJobButton.setToolButtonStyle(3)
+        self.addToJobButton.setToolButtonStyle(2)
+        self.addToJobButton.setAutoRaise(True)
         self.addToJobButton.setText("Add Job Progress")
         self.addToJobButton.setIcon(QIcon(iconFolder+'find.png'))
         self.addToJobButton.setIconSize(QSize(64, 64))
