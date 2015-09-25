@@ -121,11 +121,48 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
     def editJob(self):
+        def editJobDetails(jobNo):
+            jobForm = jobDisplayWidget(int(jobNo))
+            #popul8
+            origFile = open('.'+jobNo)
+            readFile = origFile.readlines() #load file into list
+            custItems = readFile[1]
+            if 'N/A' in readFile[2]:
+                jobForm.psuNA.setChecked(1)
+            elif 'No' in readFile[2]:
+                jobForm.psuNo.setChecked(1)
+            else:
+                jobForm.psuYes.setChecked(1)
+            custProblem = readFile[3]
+            if 'No' in readFile[4]:
+                jobForm.importantDataCheckNo.setChecked(1)
+            else:
+                jobForm.importantDataCheckYes.setChecked(1)
+            if 'No' in readFile[5]:
+                jobForm.dataBackupCheckNo.setChecked(1)
+            else:
+                custBackup = -1
+
+            jobForm.itemEdit.setText(custItems)
+            #jobForm.psuButtonGroup.setcheckedId(custPsu)
+            jobForm.problemEdit.setText(custProblem)
+            
+            self.centralWidget.addWidget(jobForm)
+            print("Editing Job",int(jobNo))
+            self.centralWidget.setCurrentWidget(jobForm)
+
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
         self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
         self.centralWidget.setCurrentWidget(searchWidget)
+        def errorChecking():
+            print (len(searchWidget.searchField.text()))
+            if len(searchWidget.searchField.text()) == 6:
+                print("success")
+                editJobDetails(searchWidget.searchField.text())
+        searchWidget.searchBtn.clicked.connect(errorChecking)
+
         
     def addToJob(self):
         pass
@@ -167,14 +204,14 @@ class mainInterface(QWidget):
             elif detailsForm.addrLineTwo.text() == "":
                 statusText = "Error: No Address"
                 pass
-            elif detailsForm.pcEdit.text() == "":
+            elif detailsForm.pcLineEdit.text() == "":
                 statusText = "Error: No Postcode"
                 pass
             else:
                 writeToFile()
             
             self.statusBar.showMessage(statusText)
-        detailsForm = custDetailForm(self)
+        detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         
         self.centralWidget.addWidget(detailsForm)

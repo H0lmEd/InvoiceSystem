@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 class findJobWidget(QWidget):
     def __init__(self, parent=None):
@@ -6,12 +6,13 @@ class findJobWidget(QWidget):
         self.layout = QVBoxLayout()
         label = QLabel("Find Job")
         searchLabel = QLabel("Job No:")
-        searchField = QLineEdit(self)
+        self.searchField = QLineEdit(self)
+        self.searchBtn = QPushButton('Go', self)
+
         self.searchLayout = QHBoxLayout()
         self.searchLayout.addWidget(searchLabel)
-        self.searchLayout.addWidget(searchField)
-        
+        self.searchLayout.addWidget(self.searchField)
+        self.searchLayout.addWidget(self.searchBtn)
         self.layout.addLayout(self.searchLayout)
-        
         self.setLayout(self.layout)
 

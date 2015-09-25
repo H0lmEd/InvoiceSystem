@@ -1,3 +1,10 @@
+# When customer is new, pcEdit = Box layout of label + button
+# When customer isnt new, pcEdit = QLineEdit
+
+
+
+
+
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle
@@ -39,9 +46,10 @@ def buttonClicked():
     print("ButtonClicked")
 
 class custDetailForm(QWidget):
-    def __init__(self, parent=None):
-        super(custDetailForm, self).__init__(parent)
+    def __init__(self, newCustomer, parent=None):
+        super(custDetailForm,self).__init__(parent)
         layout = QFormLayout()
+
         def pcLookup():
             def getHomeNo():
                 numberData = QInputDialog()
@@ -56,7 +64,7 @@ class custDetailForm(QWidget):
                     return str(numberDialog[0])
             try:
                 apiKey = '?api-key=JWsM4KuOz0aUHRyBntyd2A1611'
-                url = 'https://api.getaddress.io/v2/uk/' + self.pcEdit.text() +'/' + getHomeNo()+ apiKey
+                url = 'https://api.getaddress.io/v2/uk/' + self.pcLineEdit.text() +'/' + getHomeNo()+ apiKey
                 apiKey = 'JWsM4KuOz0aUHRyBntyd2A1611'
                 req = urllib.request.Request(url)
                 res = urllib.request.urlopen(req)
@@ -87,6 +95,16 @@ class custDetailForm(QWidget):
                 
                 reply = QMessageBox.critical(self, "Error", 
                         "Check your info and try again", QMessageBox.Ok)
+                
+        if newCustomer==True:
+            self.pcEdit = QHBoxLayout()
+            self.pcLineEdit = QLineEdit(self)
+            self.pcBtn = QPushButton('Look Up', self)
+            self.pcBtn.clicked.connect(pcLookup)
+            self.pcEdit.addWidget(self.pcLineEdit)
+            self.pcEdit.addWidget(self.pcBtn)
+        else:
+            self.pcEdit = QLineEdit(self)
             
         #WIDGETS
         instr = QLabel("""Enter your postcode and click \"Look Up\" to populate the 
@@ -106,13 +124,10 @@ class custDetailForm(QWidget):
         addrBox.addWidget(self.addrLineTwo)
         #self.addrEdit.setPlaceholderText("123 New Street\nArea\nTown")
         pcLabel = QLabel('Post Code:')
-        pcBox = QHBoxLayout()
-        self.pcEdit = QLineEdit(self)
-        pcBtn = QPushButton('Look up', self)
-        pcBtn.clicked.connect(pcLookup)
-        pcBox.addWidget(self.pcEdit)
-        pcBox.addWidget(pcBtn)
+
         self.nextButton = QPushButton("Next")
+        
+
         testEdit = ButtonLineEdit('test.png')
         testEdit.buttonClicked.connect(buttonClicked)
 
@@ -122,7 +137,7 @@ class custDetailForm(QWidget):
 
         layout.addRow(instr)
         layout.addRow(nameLabel, self.nameEdit)
-        layout.addRow(pcLabel, pcBox)
+        layout.addRow(pcLabel, self.pcEdit)
         layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
         layout.addRow(testEdit)
