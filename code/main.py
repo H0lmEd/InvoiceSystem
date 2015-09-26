@@ -64,8 +64,11 @@ class mainInterface(QWidget):
                 else:
                     custPsu = "N/A"
                 custProblem = jobForm.problemEdit.toPlainText()
-                if jobForm.importantDataGrp.checkedId() == -1:
+                print ("impdata", jobForm.importantDataGrp.checkedId())
+                custDataField = ""
+                if jobForm.importantDataGrp.checkedId() == -2:
                     custData = "Yes"
+                    custDataField = jobForm.importantData.text()
                 else:
                     custData = "No"
                 if jobForm.dataBackupGrp.checkedId() == -1:
@@ -78,6 +81,7 @@ class mainInterface(QWidget):
                 fileSaveTo.write("\n"+custPsu)
                 fileSaveTo.write("\n"+custProblem)
                 fileSaveTo.write("\n"+custData)
+                fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
                 fileSaveTo.write("\n"+custBackup)
                 self.statusBar.showMessage("job Details saved")
                 self.personalDeets(jobForm.jobNumber)
@@ -134,22 +138,28 @@ class mainInterface(QWidget):
             else:
                 jobForm.psuYes.setChecked(1)
             custProblem = readFile[3]
+            print ("Important Info?:", readFile[4])
+            print(origFile.read())
             if 'No' in readFile[4]:
                 jobForm.importantDataCheckNo.setChecked(1)
             else:
                 jobForm.importantDataCheckYes.setChecked(1)
-            if 'No' in readFile[5]:
+                jobForm.importantData.setReadOnly(False)
+                jobForm.importantData.setText(readFile[5])
+            if 'No' in readFile[6]:
                 jobForm.dataBackupCheckNo.setChecked(1)
             else:
                 custBackup = -1
 
             jobForm.itemEdit.setText(custItems)
+            jobForm.itemEdit.setCursorPosition(0)
             #jobForm.psuButtonGroup.setcheckedId(custPsu)
             jobForm.problemEdit.setText(custProblem)
             
             self.centralWidget.addWidget(jobForm)
             print("Editing Job",int(jobNo))
             self.centralWidget.setCurrentWidget(jobForm)
+            jobForm.nextButton.connect(self.editPersonalDeets)
 
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
@@ -163,7 +173,8 @@ class mainInterface(QWidget):
                 editJobDetails(searchWidget.searchField.text())
         searchWidget.searchBtn.clicked.connect(errorChecking)
 
-        
+    def editPersonalDeets(self):
+        pas
     def addToJob(self):
         pass
     def goHome(self):
@@ -184,7 +195,7 @@ class mainInterface(QWidget):
                 custName = detailsForm.nameEdit.text()
                 custAddrOne = detailsForm.addrLineOne.text()
                 custAddrTwo = detailsForm.addrLineTwo.text()
-                custPC = detailsForm.pcEdit.text()
+                custPC = detailsForm.pcLineEdit.text()
 
                 fileSaveTo = open("."+str(jobNum), "a")
                 fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
