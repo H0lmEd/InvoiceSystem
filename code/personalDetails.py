@@ -112,6 +112,8 @@ class custDetailForm(QWidget):
         nameLabel = QLabel('Full Name:')
         self.nameEdit = QLineEdit(self)
         
+        pcLabel = QLabel('Post Code:')
+
         addrLabel = QLabel('Home Address:')
         self.addrLineOne = QLineEdit(self)
         self.addrLineOne.setReadOnly(True)
@@ -123,7 +125,6 @@ class custDetailForm(QWidget):
         addrBox.addWidget(self.addrLineOne)
         addrBox.addWidget(self.addrLineTwo)
         #self.addrEdit.setPlaceholderText("123 New Street\nArea\nTown")
-        pcLabel = QLabel('Post Code:')
 
         self.nextButton = QPushButton("Next")
         

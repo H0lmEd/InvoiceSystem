@@ -1,3 +1,5 @@
+# BUGS:
+# Pressing Enter in "Fault: fucks shit up"
 import sys
 import os
 import sip
@@ -129,27 +131,27 @@ class mainInterface(QWidget):
             jobForm = jobDisplayWidget(int(jobNo))
             #popul8
             origFile = open('.'+jobNo)
-            readFile = origFile.readlines() #load file into list
-            custItems = readFile[1]
-            if 'N/A' in readFile[2]:
+            self.readFile = origFile.readlines() #load file into list
+            custItems = self.readFile[1]
+            if 'N/A' in self.readFile[2]:
                 jobForm.psuNA.setChecked(1)
-            elif 'No' in readFile[2]:
+            elif 'No' in self.readFile[2]:
                 jobForm.psuNo.setChecked(1)
             else:
                 jobForm.psuYes.setChecked(1)
-            custProblem = readFile[3]
-            print ("Important Info?:", readFile[4])
+            custProblem = self.readFile[3]
+            print ("Important Info?:", self.readFile[4])
             print(origFile.read())
-            if 'No' in readFile[4]:
+            if 'No' in self.readFile[4]:
                 jobForm.importantDataCheckNo.setChecked(1)
             else:
                 jobForm.importantDataCheckYes.setChecked(1)
                 jobForm.importantData.setReadOnly(False)
-                jobForm.importantData.setText(readFile[5])
-            if 'No' in readFile[6]:
+                jobForm.importantData.setText(self.readFile[5])
+            if 'No' in self.readFile[6]:
                 jobForm.dataBackupCheckNo.setChecked(1)
             else:
-                custBackup = -1
+                jobForm.dataBackupCheckYes.setChecked(1)
 
             jobForm.itemEdit.setText(custItems)
             jobForm.itemEdit.setCursorPosition(0)
@@ -159,7 +161,7 @@ class mainInterface(QWidget):
             self.centralWidget.addWidget(jobForm)
             print("Editing Job",int(jobNo))
             self.centralWidget.setCurrentWidget(jobForm)
-            jobForm.nextButton.connect(self.editPersonalDeets)
+            jobForm.nextButton.clicked.connect(self.editPersonalDeets)
 
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
@@ -174,7 +176,16 @@ class mainInterface(QWidget):
         searchWidget.searchBtn.clicked.connect(errorChecking)
 
     def editPersonalDeets(self):
-        pas
+       detailsForm = custDetailForm(False)
+       print(self.readFile)
+       detailsForm.nameEdit.setText(self.readFile[8])
+       detailsForm.pcEdit.setText(self.readFile[9])
+       detailsForm.addrLineOne.setText(self.readFile[10])
+       detailsForm.addrLineTwo.setText(self.readFile[11])
+       self.centralWidget.addWidget(detailsForm)
+       self.centralWidget.setCurrentWidget(detailsForm)
+
+
     def addToJob(self):
         pass
     def goHome(self):
@@ -199,9 +210,9 @@ class mainInterface(QWidget):
 
                 fileSaveTo = open("."+str(jobNum), "a")
                 fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
+                fileSaveTo.write('\n'+custPC)
                 fileSaveTo.write('\n'+custAddrOne)
                 fileSaveTo.write('\n'+custAddrTwo)
-                fileSaveTo.write('\n'+custPC)
                 fileSaveTo.close()
                 self.statusBar.showMessage("Job Details Saved")
                 
