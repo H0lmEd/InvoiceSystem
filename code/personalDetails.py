@@ -7,7 +7,7 @@
 
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
                                 QCheckBox, QTextEdit, QPushButton)
-from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle
+from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle, QGroupBox
 from PyQt5.QtCore import QSize,pyqtSignal
 from PyQt5.QtGui import QIcon
 import json
@@ -133,7 +133,7 @@ class custDetailForm(QWidget):
         testEdit.buttonClicked.connect(buttonClicked)
 
 
-
+        titleBox = QGroupBox("Customer Details")
 
 
         layout.addRow(instr)
@@ -142,7 +142,11 @@ class custDetailForm(QWidget):
         layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
         layout.addRow(testEdit)
-        self.setLayout(layout)
+        titleBox.setLayout(layout)
+
+        mainLayout = QVBoxLayout(self)
+        mainLayout.addWidget(titleBox)
+        self.setLayout(mainLayout)
     def notTheAddress(self):
         instructions = QMessageBox.information(self, 'Info',
                 "Enter the customer's address manually")

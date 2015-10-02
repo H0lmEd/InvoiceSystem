@@ -1,4 +1,4 @@
-# BUGS:
+# ah BUGS:
 # Pressing Enter in "Fault: fucks shit up"
 import sys
 import os
@@ -9,7 +9,7 @@ from PyQt5.QtGui import *
 from findJob import findJobWidget
 from buttons import buttonsWidget
 from jobDisplay import jobDisplayWidget
-
+from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
 #from PyKde4.kdeui import KIcon
 
@@ -22,8 +22,8 @@ class mainInterface(QWidget):
 
         self.buttons = buttonsWidget(self)
         self.buttons.newJobButton.clicked.connect(self.newJob)
-        self.buttons.editJobButton.clicked.connect(self.editJob)
-        self.buttons.addToJobButton.clicked.connect(self.addToJob)
+        self.buttons.editJobButton.clicked.connect(lambda: self.getJobNumber(1))
+        self.buttons.addToJobButton.clicked.connect(lambda: self.getJobNumber(2))
         self.centralWidget.addWidget(self.buttons)
         
         #self.progressWidget = progressWidget()
@@ -126,68 +126,72 @@ class mainInterface(QWidget):
         
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
-    def editJob(self):
-        def editJobDetails(jobNo):
-            jobForm = jobDisplayWidget(int(jobNo))
-            #popul8
-            origFile = open('.'+jobNo)
-            self.readFile = origFile.readlines() #load file into list
-            custItems = self.readFile[1]
-            if 'N/A' in self.readFile[2]:
-                jobForm.psuNA.setChecked(1)
-            elif 'No' in self.readFile[2]:
-                jobForm.psuNo.setChecked(1)
-            else:
-                jobForm.psuYes.setChecked(1)
-            custProblem = self.readFile[3]
-            print ("Important Info?:", self.readFile[4])
-            print(origFile.read())
-            if 'No' in self.readFile[4]:
-                jobForm.importantDataCheckNo.setChecked(1)
-            else:
-                jobForm.importantDataCheckYes.setChecked(1)
-                jobForm.importantData.setReadOnly(False)
-                jobForm.importantData.setText(self.readFile[5])
-            if 'No' in self.readFile[6]:
-                jobForm.dataBackupCheckNo.setChecked(1)
-            else:
-                jobForm.dataBackupCheckYes.setChecked(1)
-
-            jobForm.itemEdit.setText(custItems)
-            jobForm.itemEdit.setCursorPosition(0)
-            #jobForm.psuButtonGroup.setcheckedId(custPsu)
-            jobForm.problemEdit.setText(custProblem)
-            
-            self.centralWidget.addWidget(jobForm)
-            print("Editing Job",int(jobNo))
-            self.centralWidget.setCurrentWidget(jobForm)
-            jobForm.nextButton.clicked.connect(self.editPersonalDeets)
-
+    def getJobNumber(self, nextFunction):
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
-        self.titleLayout.addWidget(self.jobSearchTitle)
+        #self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
         self.centralWidget.setCurrentWidget(searchWidget)
         def errorChecking():
             print (len(searchWidget.searchField.text()))
             if len(searchWidget.searchField.text()) == 6:
                 print("success")
-                editJobDetails(searchWidget.searchField.text())
+                if nextFunction == 1:
+                    self.editJobDetails(int(searchWidget.searchField.text()))
+                elif nextFunction == 2:
+                    self.addToJob(int(searchWidget.searchField.text()))
         searchWidget.searchBtn.clicked.connect(errorChecking)
 
     def editPersonalDeets(self):
-       detailsForm = custDetailForm(False)
-       print(self.readFile)
-       detailsForm.nameEdit.setText(self.readFile[8])
-       detailsForm.pcEdit.setText(self.readFile[9])
-       detailsForm.addrLineOne.setText(self.readFile[10])
-       detailsForm.addrLineTwo.setText(self.readFile[11])
-       self.centralWidget.addWidget(detailsForm)
-       self.centralWidget.setCurrentWidget(detailsForm)
+        detailsForm = custDetailForm(False)
+        print(self.readFile)
+        detailsForm.nameEdit.setText(self.readFile[8])
+        detailsForm.pcEdit.setText(self.readFile[9])
+        detailsForm.addrLineOne.setText(self.readFile[10])
+        detailsForm.addrLineTwo.setText(self.readFile[11])
+        self.centralWidget.addWidget(detailsForm)
+        self.centralWidget.setCurrentWidget(detailsForm)
+    def editJobDetails(self, jobNo):
+        jobForm = jobDisplayWidget(int(jobNo))
+        #popul8
+        origFile = open('.'+str(jobNo))
+        self.readFile = origFile.readlines() #load file into list
+        custItems = self.readFile[1]
+        if 'N/A' in self.readFile[2]:
+            jobForm.psuNA.setChecked(1)
+        elif 'No' in self.readFile[2]:
+            jobForm.psuNo.setChecked(1)
+        else:
+            jobForm.psuYes.setChecked(1)
+        custProblem = self.readFile[3]
+        print ("Important Info?:", self.readFile[4])
+        print(origFile.read())
+        if 'No' in self.readFile[4]:
+            jobForm.importantDataCheckNo.setChecked(1)
+        else:
+            jobForm.importantDataCheckYes.setChecked(1)
+            jobForm.importantData.setReadOnly(False)
+            jobForm.importantData.setText(self.readFile[5])
+        if 'No' in self.readFile[6]:
+            jobForm.dataBackupCheckNo.setChecked(1)
+        else:
+            jobForm.dataBackupCheckYes.setChecked(1)
+            jobForm.itemEdit.setText(custItems)
+        jobForm.itemEdit.setCursorPosition(0)
+        #jobForm.psuButtonGroup.setcheckedId(custPsu)
+        jobForm.problemEdit.setText(custProblem)
+       
+        self.centralWidget.addWidget(jobForm)
+        print("Editing Job",int(jobNo))
+        self.centralWidget.setCurrentWidget(jobForm)
+        jobForm.nextButton.clicked.connect(self.editPersonalDeets)
 
 
-    def addToJob(self):
-        pass
+
+    def addToJob(self, jobNo):
+        jobProgress = jobProgressWidget(jobNo)
+        self.centralWidget.addWidget(jobProgress)
+        self.centralWidget.setCurrentWidget(jobProgress)
     def goHome(self):
         titleWidget = self.centralWidget.currentWidget()
         if "findJob" in str(titleWidget):
