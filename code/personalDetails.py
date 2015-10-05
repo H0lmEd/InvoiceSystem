@@ -111,6 +111,15 @@ class custDetailForm(QWidget):
                 \"Home Address\" field with your address automatically""")
         nameLabel = QLabel('Full Name:')
         self.nameEdit = QLineEdit(self)
+
+        emailLabel = QLabel('Email Address:')
+        self.emailAddr = QLineEdit(self)
+
+        phoneLabel = QLabel('Home Phone Number:')
+        self.phoneNo = QLineEdit(self) # add multi box with aread code
+
+        mobileLabel = QLabel('Mobile Phone Number:')
+        self.mobileNo = QLineEdit(self)
         
         pcLabel = QLabel('Post Code:')
 
@@ -138,6 +147,9 @@ class custDetailForm(QWidget):
 
         layout.addRow(instr)
         layout.addRow(nameLabel, self.nameEdit)
+        layout.addRow(emailLabel, self.emailAddr)
+        layout.addRow(phoneLabel, self.phoneNo)
+        layout.addRow(mobileLabel, self.mobileNo)
         layout.addRow(pcLabel, self.pcEdit)
         layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
