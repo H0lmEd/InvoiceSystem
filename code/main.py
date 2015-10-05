@@ -3,6 +3,7 @@
 import sys
 import os
 import sip
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -58,6 +59,7 @@ class mainInterface(QWidget):
 
         def errorChecking():
             def writeToFile():
+                staff = jobForm.staffEdit.text()
                 custItems = jobForm.itemEdit.text()
                 if jobForm.psuButtonGroup.checkedId == -2:
                     custPsu = "Yes"
@@ -65,8 +67,14 @@ class mainInterface(QWidget):
                     custPsu = "No"
                 else:
                     custPsu = "N/A"
+                itemCondition = jobForm.condition.text()
                 custProblem = jobForm.problemEdit.toPlainText()
-                print ("impdata", jobForm.importantDataGrp.checkedId())
+                custPasswordField = ""
+                if jobForm.passButtonGroup.checkedId() == -1:
+                    custPasswords =  "Yes"
+                    custPasswordField = jobForm.passwords.toPlainText()
+                else:
+                    custPasswords = "No"
                 custDataField = ""
                 if jobForm.importantDataGrp.checkedId() == -2:
                     custData = "Yes"
@@ -79,25 +87,35 @@ class mainInterface(QWidget):
                     custBackup = "No"
                 fileSaveTo = open("."+str(jobForm.jobNumber), "a")
                 fileSaveTo.write("JOBDETAILS")
+                fileSaveTo.write("\n"+staff)
                 fileSaveTo.write("\n"+custItems)
                 fileSaveTo.write("\n"+custPsu)
+                fileSaveTo.write("\n"+itemCondition)
                 fileSaveTo.write("\n"+custProblem)
+                fileSaveTo.write("\n"+custPasswords)
+                fileSaveTo.write("\n"+custPasswordField)
                 fileSaveTo.write("\n"+custData)
                 fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
                 fileSaveTo.write("\n"+custBackup)
                 self.statusBar.showMessage("job Details saved")
                 self.personalDeets(jobForm.jobNumber)
             statusText = "No Eeorrs"
-
-            if jobForm.itemEdit.text() == "":
+            if jobForm.staffEdit.text() == "":
+                statusText = "Error: Who are you?"
+                pass
+            elif jobForm.itemEdit.text() == "":
                 statusText = "Error: Enter Items"
                 pass
             elif jobForm.psuButtonGroup.checkedId() == -1:
                 statusText = "Error: PSU>?"
                 pass
+            elif jobForm.condition.text() == "":
+                statusTest = "Error: item Condition"
+                pass
             elif jobForm.problemEdit.toPlainText() == "":
                 statusText = "Error: no prob?"
                 pass
+            
             elif jobForm.importantDataGrp.checkedId() == -1:
                 statusText = "Error: DAta?!"
                 pass
@@ -156,31 +174,39 @@ class mainInterface(QWidget):
         #popul8
         origFile = open('.'+str(jobNo))
         self.readFile = origFile.readlines() #load file into list
-        custItems = self.readFile[1]
-        if 'N/A' in self.readFile[2]:
+        staff = self.readFile[1]
+        custItems = self.readFile[2]
+        if 'N/A' in self.readFile[3]:
             jobForm.psuNA.setChecked(1)
-        elif 'No' in self.readFile[2]:
+        elif 'No' in self.readFile[3]:
             jobForm.psuNo.setChecked(1)
         else:
             jobForm.psuYes.setChecked(1)
-        custProblem = self.readFile[3]
-        print ("Important Info?:", self.readFile[4])
+        itemCondition = self.readFile[4]
+        custProblem = self.readFile[5]
+        if "No" in self.readFile[6]:
+            jobForm.passwordCheckNo.setChecked(1)
+            jobForm.passwords.setText(self.readFile[7])
+        elif "Yes" in self.readFile[6]:
+            jobForm.passwordCheckYes.setChecked(1)
         print(origFile.read())
-        if 'No' in self.readFile[4]:
+        if 'No' in self.readFile[8]:
             jobForm.importantDataCheckNo.setChecked(1)
         else:
             jobForm.importantDataCheckYes.setChecked(1)
             jobForm.importantData.setReadOnly(False)
-            jobForm.importantData.setText(self.readFile[5])
-        if 'No' in self.readFile[6]:
+            jobForm.importantData.setText(self.readFile[9])
+        if 'No' in self.readFile[10]:
             jobForm.dataBackupCheckNo.setChecked(1)
         else:
             jobForm.dataBackupCheckYes.setChecked(1)
             jobForm.itemEdit.setText(custItems)
+        jobForm.staffEdit.setText(staff)
         jobForm.itemEdit.setCursorPosition(0)
         #jobForm.psuButtonGroup.setcheckedId(custPsu)
+        jobForm.condition.setText(itemCondition)
         jobForm.problemEdit.setText(custProblem)
-       
+        
         self.centralWidget.addWidget(jobForm)
         print("Editing Job",int(jobNo))
         self.centralWidget.setCurrentWidget(jobForm)

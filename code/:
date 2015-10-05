@@ -67,13 +67,11 @@ class jobProgressWidget(QWidget):
         print (self.partsTable.rowCount())
         
         for x in range(self.partsTable.rowCount()):
-            print('x:',x)
             
             for i in range(self.partsTable.columnCount()):
-                print ('i:', i)
-                if i == 1:
-                    print('Part',self.partsTable.item(x,i).text())
-                    totalExVat = totalExVat + int(self.partsTable.item(x,i).text())
+                print ('Column:', i)
+                if i == 2:
+                    totalExVat = totalExVat + int(self.partsTable.itemAt(x,i).text())
                     print(totalExVat)
                 i = i+1
                     
@@ -81,7 +79,5 @@ class jobProgressWidget(QWidget):
             print('Row:',x)
 
             rount = rount+1
-        self.subTotal.setText(str(totalExVat))
-        self.taxAmount.setText(str((totalExVat*0.2)))
-        self.totalAmount.setText(str((totalExVat*1.2)))
+
 

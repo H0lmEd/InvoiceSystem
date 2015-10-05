@@ -47,11 +47,15 @@ class jobDisplayWidget(QWidget):
 
         passwordsLabel = QLabel('Passwords:')
         self.passwordWidgets = QVBoxLayout()
+        self.passButtonGroup = QButtonGroup(self)
         self.passwords = QTextEdit(self)
 
         self.passwordBox = QHBoxLayout()
         self.passwordCheckYes = QCheckBox('Yes', self)
         self.passwordCheckNo = QCheckBox('No', self)
+        self.passButtonGroup.addButton(self.passwordCheckYes)
+        self.passButtonGroup.addButton(self.passwordCheckNo)
+
         self.passwordBox.addWidget(self.passwordCheckYes)
         self.passwordBox.addWidget(self.passwordCheckNo)
         self.passwordWidgets.addLayout(self.passwordBox)
