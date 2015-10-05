@@ -12,6 +12,8 @@ class customTableWidget(QTableWidget):
             print("ENTER PRESSED")
             super().insertRow(1)
             super().setCurrentCell((super().currentRow()+1), 0)
+            #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
+            #jobProgressWidget.cellWatcher
 
 class jobProgressWidget(QWidget):
     def __init__(self, jobNumber, parent=None):
@@ -33,7 +35,9 @@ class jobProgressWidget(QWidget):
         tableHeaders = ["Item","Cost ExVat", "Total"]
         self.partsTable.setHorizontalHeaderLabels(tableHeaders)
         self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.partsTable.cellChanged.connect(self.updateTotals)
     
+        
         self.subTotal = QLabel("$Money")
         self.taxAmount = QLabel("$Less Mpney")
         self.totalAmount = QLabel("$More Money")
@@ -67,21 +71,14 @@ class jobProgressWidget(QWidget):
         print (self.partsTable.rowCount())
         
         for x in range(self.partsTable.rowCount()):
-            print('x:',x)
-            
-            for i in range(self.partsTable.columnCount()):
+            for i in range(self.partsTable.columnCount()): #go through cells 
                 print ('i:', i)
                 if i == 1:
-                    print('Part',self.partsTable.item(x,i).text())
-                    totalExVat = totalExVat + int(self.partsTable.item(x,i).text())
-                    print(totalExVat)
-                i = i+1
-                    
-                count = count+1
-            print('Row:',x)
-
-            rount = rount+1
+                    try:
+                        totalExVat = totalExVat + int(self.partsTable.item(x,i).text())
+                    except AttributeError:
+                        pass
+        
         self.subTotal.setText(str(totalExVat))
         self.taxAmount.setText(str((totalExVat*0.2)))
         self.totalAmount.setText(str((totalExVat*1.2)))
-
