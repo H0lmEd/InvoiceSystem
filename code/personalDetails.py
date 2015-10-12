@@ -1,49 +1,24 @@
 # When customer is new, pcEdit = Box layout of label + button
-# When customer isnt new, pcEdit = QLineEdit
+# When customer isnt new, pcEdit = ButtonLineEdit
 
 
 
 
 
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
+from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel,
                                 QCheckBox, QTextEdit, QPushButton)
 from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle, QGroupBox
 from PyQt5.QtCore import QSize,pyqtSignal
 from PyQt5.QtGui import QIcon
+from customButton import ButtonLineEdit
 import json
+import os
 import PyQt5.QtGui
 import PyQt5.QtCore
 import PyQt5.QtWidgets
 import urllib
 import requests
-class ButtonLineEdit(QLineEdit):
-    buttonClicked = pyqtSignal(bool)
 
-    def __init__(self, icon_file, parent=None):
-        super(ButtonLineEdit, self).__init__(parent)
-
-        self.button = QToolButton(self)
-        self.button.setIcon(QIcon(icon_file))
-        self.button.setStyleSheet('border: 0px; padding: 0px;') #No Padding
-        #self.button.setCursor(ArrowCursor)
-        self.button.clicked.connect(self.buttonClicked.emit)
-
-        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)# Set to label length
-        buttonSize = self.button.sizeHint()
-
-        self.setStyleSheet('QLineEdit {padding-right: %dpx; }' % (buttonSize.width() + frameWidth + 1))
-        self.setMinimumSize(max(self.minimumSizeHint().width(), buttonSize.width() + frameWidth*2 + 2),
-                            max(self.minimumSizeHint().height(), buttonSize.height() + frameWidth*2 + 2))
-
-    def resizeEvent(self, event):
-        buttonSize = self.button.sizeHint()
-        frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
-        self.button.move(self.rect().right() - frameWidth - buttonSize.width(),
-                         (self.rect().bottom() - buttonSize.height() + 1)/2)
-        super(ButtonLineEdit, self).resizeEvent(event)
-
-def buttonClicked():
-    print("ButtonClicked")
 
 class custDetailForm(QWidget):
     def __init__(self, newCustomer, parent=None):
@@ -98,36 +73,36 @@ class custDetailForm(QWidget):
                 
         if newCustomer==True:
             self.pcEdit = QHBoxLayout()
-            self.pcLineEdit = QLineEdit(self)
+            self.pcLineEdit = ButtonLineEdit(self)
             self.pcBtn = QPushButton('Look Up', self)
             self.pcBtn.clicked.connect(pcLookup)
             self.pcEdit.addWidget(self.pcLineEdit)
             self.pcEdit.addWidget(self.pcBtn)
         else:
-            self.pcEdit = QLineEdit(self)
+            self.pcEdit = ButtonLineEdit(self)
             
         #WIDGETS
         instr = QLabel("""Enter your postcode and click \"Look Up\" to populate the 
                 \"Home Address\" field with your address automatically""")
         nameLabel = QLabel('Full Name:')
-        self.nameEdit = QLineEdit(self)
+        self.nameEdit = ButtonLineEdit(self)
 
         emailLabel = QLabel('Email Address:')
-        self.emailAddr = QLineEdit(self)
+        self.emailAddr = ButtonLineEdit(self)
 
         phoneLabel = QLabel('Home Phone Number:')
-        self.phoneNo = QLineEdit(self) # add multi box with aread code
+        self.phoneNo = ButtonLineEdit(self) # add multi box with aread code
 
         mobileLabel = QLabel('Mobile Phone Number:')
-        self.mobileNo = QLineEdit(self)
+        self.mobileNo = ButtonLineEdit(self)
         
         pcLabel = QLabel('Post Code:')
 
         addrLabel = QLabel('Home Address:')
-        self.addrLineOne = QLineEdit(self)
+        self.addrLineOne = ButtonLineEdit(self)
         self.addrLineOne.setReadOnly(True)
 
-        self.addrLineTwo = QLineEdit(self)
+        self.addrLineTwo = ButtonLineEdit(self)
         self.addrLineTwo.setReadOnly(True)
         self.addrLineTwo.setFrame(True)
         addrBox = QVBoxLayout()
@@ -139,7 +114,6 @@ class custDetailForm(QWidget):
         
 
         testEdit = ButtonLineEdit('test.png')
-        testEdit.buttonClicked.connect(buttonClicked)
 
 
         titleBox = QGroupBox("Customer Details")

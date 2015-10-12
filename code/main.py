@@ -51,7 +51,8 @@ class mainInterface(QWidget):
         mainLayout.addWidget(jobButton)
         mainLayout.addWidget(homeButton)
         self.setLayout(mainLayout)
-        self.setGeometry(390, 365, 390, 365)
+        #self.setGeometry(790, 365, 390, 365)
+        self.resize(600, 600)
     #def hzLine(self):
         #line = QFrame()
         #lane.setFrame
@@ -70,10 +71,13 @@ class mainInterface(QWidget):
                 itemCondition = jobForm.condition.text()
                 custProblem = jobForm.problemEdit.toPlainText()
                 custPasswordField = ""
-                if jobForm.passButtonGroup.checkedId() == -1:
+                print("Passwords",jobForm.passButtonGroup.checkedId())
+                if jobForm.passButtonGroup.checkedId() == -2:
+                    print("Password Detected")
                     custPasswords =  "Yes"
                     custPasswordField = jobForm.passwords.toPlainText()
                 else:
+                    print("No Password")
                     custPasswords = "No"
                 custDataField = ""
                 if jobForm.importantDataGrp.checkedId() == -2:
@@ -100,32 +104,61 @@ class mainInterface(QWidget):
                 self.statusBar.showMessage("job Details saved")
                 self.personalDeets(jobForm.jobNumber)
             statusText = "No Eeorrs"
+            errorsDetected = False
+        def staffEditCheck():
             if jobForm.staffEdit.text() == "":
-                statusText = "Error: Who are you?"
-                pass
-            elif jobForm.itemEdit.text() == "":
-                statusText = "Error: Enter Items"
-                pass
-            elif jobForm.psuButtonGroup.checkedId() == -1:
-                statusText = "Error: PSU>?"
-                pass
-            elif jobForm.condition.text() == "":
-                statusTest = "Error: item Condition"
-                pass
-            elif jobForm.problemEdit.toPlainText() == "":
-                statusText = "Error: no prob?"
-                pass
-            
-            elif jobForm.importantDataGrp.checkedId() == -1:
-                statusText = "Error: DAta?!"
-                pass
-            elif jobForm.dataBackupGrp.checkedId() == -1:
-                statusText = "Error: Backup?"
-                pass
+                jobForm.staffVal.error()
+                errorsDetected = True
             else:
+                jobForm.staffVal.tick()
+        def itemEditCheck():
+            if jobForm.itemEdit.text() == "":
+                jobForm.itemVal.error()
+                errorsDetected = True
+            else:
+                jobForm.itemVal.tick()
+        def psuButtonCheck():
+            if jobForm.psuButtonGroup.checkedId() == -1:
+                jobForm.psuVal.error()
+                errorsDetected = True
+            else:
+                jobForm.psuVal.tick()
+        def conditionCheck():
+            if jobForm.condition.text() == "":
+                jobForm.conditionVal.error()
+                errorsDetected = True
+            else:
+                jobForm.conditionVal.tick()
+        def problemEditCheck():
+            if jobForm.problemEdit.toPlainText() == "":
+                jobForm.problemEditVal.error()
+                errorsDetected = True
+            else:
+                jobForm.problemEditVal.tick()
+        def importantDataBoxCheck():
+            if jobForm.importantDataGrp.checkedId() == -1:
+                jobForm.importantDataCheckVal.error()
+                errorsDetected = True
+            else:
+                jobForm.importantDataCheckVal.tick()
+        def importantDataFieldCheck():
+            if jobFoem.importantData == "":
+                jobForm.importantDataVal.error()
+                errorsDetected = True
+            else:
+                jobForm.importantDataVal.tick()
+        def dataBackupCheck():
+            if jobForm.dataBackupGrp.checkedId() == -1:
+                jobForm.dataBackupCheckVal.error()
+                errorsDetected = True
+            else:
+                jobForm.dataBackupCheckVal.tick()
+            
+            
+            if errorsDetected == False:
                 writeToFile()
-
-            self.statusBar.showMessage(statusText)
+            else:
+                self.statusBar.showMessage("Fix Errors")
         #global progressWidget
         #progressWidget = customProgressWidget()
         #self.titleLayout.addWidget(progressWidget)
@@ -140,6 +173,10 @@ class mainInterface(QWidget):
 
         jobForm = jobDisplayWidget(jobNumberGenerator())
         jobForm.nextButton.clicked.connect(errorChecking)
+
+        jobForm.staffEdit.editingFinished.connect(staffEditCheck)
+        jobForm.itemEdit.editingFinished.connect(itemEditCheck)
+#        jobForm.condition.clicked.connect(psuButtonCheck)
         jobForm.importantDataGrp.buttonClicked.connect(jobForm.importantDataChecked)
         
         self.centralWidget.addWidget(jobForm)
@@ -174,6 +211,7 @@ class mainInterface(QWidget):
         #popul8
         origFile = open('.'+str(jobNo))
         self.readFile = origFile.readlines() #load file into list
+        print("FIle:",self.readFile)
         staff = self.readFile[1]
         custItems = self.readFile[2]
         if 'N/A' in self.readFile[3]:
@@ -186,9 +224,9 @@ class mainInterface(QWidget):
         custProblem = self.readFile[5]
         if "No" in self.readFile[6]:
             jobForm.passwordCheckNo.setChecked(1)
-            jobForm.passwords.setText(self.readFile[7])
         elif "Yes" in self.readFile[6]:
             jobForm.passwordCheckYes.setChecked(1)
+            jobForm.passwords.setText(self.readFile[7])
         print(origFile.read())
         if 'No' in self.readFile[8]:
             jobForm.importantDataCheckNo.setChecked(1)
@@ -200,7 +238,7 @@ class mainInterface(QWidget):
             jobForm.dataBackupCheckNo.setChecked(1)
         else:
             jobForm.dataBackupCheckYes.setChecked(1)
-            jobForm.itemEdit.setText(custItems)
+        jobForm.itemEdit.setText(custItems)
         jobForm.staffEdit.setText(staff)
         jobForm.itemEdit.setCursorPosition(0)
         #jobForm.psuButtonGroup.setcheckedId(custPsu)
@@ -247,22 +285,31 @@ class mainInterface(QWidget):
                 self.statusBar.showMessage("Job Details Saved")
                 
             statusText = "NO Errors"
+            print("Checking")
             if detailsForm.nameEdit.text() == "":
-                statusText = "Error: No name"
-                pass
-            elif detailsForm.addrLineOne.text() == "":
-                statusText = "Error: No Address"
-                pass
-            elif detailsForm.addrLineTwo.text() == "":
-                statusText = "Error: No Address"
-                pass
-            elif detailsForm.pcLineEdit.text() == "":
-                statusText = "Error: No Postcode"
-                pass
+                errorsDetected = True
+                detailsForm.nameEdit.showError()
+            else:
+                detailsForm.nameEdit.showTick()
+
+            if detailsForm.pcLineEdit.text() == "":
+                errorsDetected = True                
+                detailsForm.pcLineEdit.showError()
+            else:
+                detailsForm.pcLineEdit.showTick()
+
+            if detailsForm.addrLineOne.text() == "" or detailsForm.addrLineTwo.text() == "":
+                errorsDetected = True
+                detailsForm.addrLineOne.showError()
+                detailsForm.addrLineTwo.showError()
+            else:
+                detailsForm.addrLineOne.showTick()
+                detailsForm.addrLineTwo.showTick()
+            
+            if errorsDetected == True:
+                self.statusBar.showMessage("Correct the marked fields")
             else:
                 writeToFile()
-            
-            self.statusBar.showMessage(statusText)
         detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         

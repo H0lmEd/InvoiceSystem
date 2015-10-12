@@ -78,7 +78,8 @@ class jobProgressWidget(QWidget):
                         totalExVat = totalExVat + int(self.partsTable.item(x,i).text())
                     except AttributeError:
                         pass
-        
-        self.subTotal.setText(str(totalExVat))
-        self.taxAmount.setText(str((totalExVat*0.2)))
-        self.totalAmount.setText(str((totalExVat*1.2)))
+        pound = u'\u00A3'
+
+        self.subTotal.setText(pound+str(totalExVat))
+        self.taxAmount.setText(pound+str((totalExVat*0.2)))
+        self.totalAmount.setText(pound+str((totalExVat*1.2)))
