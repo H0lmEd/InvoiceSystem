@@ -38,9 +38,8 @@ class custDetailForm(QWidget):
                     print(str(numberDialog[0]))
                     return str(numberDialog[0])
             try:
-                apiKey = '?api-key=JWsM4KuOz0aUHRyBntyd2A1611'
+                apiKey = '?api-key=k-0nPmNhZ06jmM4g29K8yw1962'
                 url = 'https://api.getaddress.io/v2/uk/' + self.pcLineEdit.text() +'/' + getHomeNo()+ apiKey
-                apiKey = 'JWsM4KuOz0aUHRyBntyd2A1611'
                 req = urllib.request.Request(url)
                 res = urllib.request.urlopen(req)
                 addrResponse = str(res.read())
@@ -82,9 +81,9 @@ class custDetailForm(QWidget):
             self.pcEdit = ButtonLineEdit(self)
             
         #WIDGETS
-        instr = QLabel("""Enter your postcode and click \"Look Up\" to populate the 
-                \"Home Address\" field with your address automatically""")
-        nameLabel = QLabel('Full Name:')
+        instr = QLabel("""Enter the customer's details. Fields marked with
+                        a (*) are required""")
+        nameLabel = QLabel('* Full Name:')
         self.nameEdit = ButtonLineEdit(self)
 
         emailLabel = QLabel('Email Address:')
@@ -93,12 +92,12 @@ class custDetailForm(QWidget):
         phoneLabel = QLabel('Home Phone Number:')
         self.phoneNo = ButtonLineEdit(self) # add multi box with aread code
 
-        mobileLabel = QLabel('Mobile Phone Number:')
+        mobileLabel = QLabel('* Mobile Phone Number:')
         self.mobileNo = ButtonLineEdit(self)
         
-        pcLabel = QLabel('Post Code:')
+        pcLabel = QLabel('* Post Code:')
 
-        addrLabel = QLabel('Home Address:')
+        addrLabel = QLabel('* Home Address:')
         self.addrLineOne = ButtonLineEdit(self)
         self.addrLineOne.setReadOnly(True)
 
@@ -113,7 +112,6 @@ class custDetailForm(QWidget):
         self.nextButton = QPushButton("Next")
         
 
-        testEdit = ButtonLineEdit('test.png')
 
 
         titleBox = QGroupBox("Customer Details")
@@ -127,7 +125,6 @@ class custDetailForm(QWidget):
         layout.addRow(pcLabel, self.pcEdit)
         layout.addRow(addrLabel, addrBox)
         layout.addRow(self.nextButton)
-        layout.addRow(testEdit)
         titleBox.setLayout(layout)
 
         mainLayout = QVBoxLayout(self)

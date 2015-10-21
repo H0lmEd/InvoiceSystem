@@ -72,7 +72,7 @@ class jobDisplayWidget(QWidget):
 
         passwordsLabel = QLabel('Passwords:')
         self.passwordWidgets = QVBoxLayout()
-        self.passButtonGroup = QButtonGroup(self)
+        self.passButtonGrp = QButtonGroup(self)
         self.passwords = QTextEdit(self)
         self.passwordsVal = validationImage(self)
         self.passwordFieldBox = QHBoxLayout()
@@ -84,8 +84,8 @@ class jobDisplayWidget(QWidget):
         self.passwordCheckNo = QCheckBox('No', self)
         self.passwordCheckVal = validationImage(self)
 
-        self.passButtonGroup.addButton(self.passwordCheckYes)
-        self.passButtonGroup.addButton(self.passwordCheckNo)
+        self.passButtonGrp.addButton(self.passwordCheckYes)
+        self.passButtonGrp.addButton(self.passwordCheckNo)
 
         self.passwordBox.addWidget(self.passwordCheckYes)
         self.passwordBox.addWidget(self.passwordCheckNo)
