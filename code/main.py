@@ -232,43 +232,48 @@ class mainInterface(QWidget):
                 
         def nameEditCheck():
             if detailsForm.nameEdit.text() == "":
-                detailsForm.nameEdit.error()
+                detailsForm.nameVal.error()
                 self.errorsDetected = True
             else:
-                detailsForm.nameEdit.tick()
+                detailsForm.nameVal.tick()
         def emailCheck():
             if detailsForm.emailAddr.text() == "":
                 pass
             elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
-                detailsForm.emailAddr.tick()
+                detailsForm.emailVal.tick()
             else:
-                detailsform.emailAddr.error()
+                detailsForm.emailVal.error()
                 self.errorsDetected = True
-        def phoneLabel():
+        def phoneCheck():
             if detailsForm.phoneNo.text() == "":
                 pass
             else:
                 phoneFull = detailsForm.phoneNo.text().replace(" ","")
                 if phoneFull.isdigit() and phoneFull[0] == 0 and phoneFull.len() == 11:
-                    detailsForm.phoneNo.tick()
+                    detailsForm.phoneVal.tick()
                 else:
-                    detailsForm.phoneNo.error()
+                    detailsForm.phoneVal.error()
         def pcEditCheck():
             if detailsForm.pcLineEdit.text() == "":
                 self.errorsDetected = True                
-                detailsForm.pcLineEdit.showError()
+                detailsForm.pcVal.error()
             else:
-                detailsForm.pcLineEdit.showTick()
+                detailsForm.pcVal.tick()
 
             if detailsForm.addrLineOne.text() == "" or detailsForm.addrLineTwo.text() == "":
                 self.errorsDetected = True
-                detailsForm.addrLineOne.showError()
+                detailsForm.addrLineOneVal.error()
         def errorChecking():
-            errorFunctions = [nameEditCheck, emailCheck, phoneCheck]
-            self.errorDetected = False
+            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, pcEditCheck]
+            self.errorsDetected = False
             x = 0
             for i in errorFunctions:
                 print(i,x)
+                i()
+                if self.errorsDetected == True:
+                    self.statusBar.showMessage("Fix Errors")
+                    print("ERRORS")
+                    break
         detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)
