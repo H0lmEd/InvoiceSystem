@@ -22,12 +22,12 @@ class jobDisplayWidget(QWidget):
         staffErrorBox.addWidget(self.staffVal)
 
         jobNoLabel = QLabel('Job Number:')
-        jobNoEdit = QLineEdit(self)
-        jobNoEdit.setReadOnly(True)
+        self.jobNoEdit = QLineEdit(self)
+        self.jobNoEdit.setReadOnly(True)
         jobNoVal = validationImage(self)
-        jobNoEdit.setPlaceholderText(str(self.jobNumber))
+        self.jobNoEdit.setPlaceholderText(str(self.jobNumber))
         jobNoBox = QHBoxLayout()
-        jobNoBox.addWidget(jobNoEdit)
+        jobNoBox.addWidget(self.jobNoEdit)
         jobNoBox.addWidget(jobNoVal)
         
         itemLabel = QLabel('Items:')
@@ -143,7 +143,7 @@ class jobDisplayWidget(QWidget):
 
       
         titleBox = QGroupBox("New Job")
-        titleBox.setAlignment(Qt.AlignRight)
+        titleBox.setAlignment(Qt.AlignHCenter)
 
         layout.addRow(staffLabel, staffErrorBox)
         layout.addRow(jobNoLabel, jobNoBox)

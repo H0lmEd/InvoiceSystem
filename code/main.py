@@ -109,11 +109,14 @@ class mainInterface(QWidget):
            else:
                 jobForm.staffVal.tick()
         def itemEditCheck():
+            print("Item Check")
             if jobForm.itemEdit.text() == "":
                 jobForm.itemVal.error()
+                print("Item Error")
                 self.errorsDetected = True
             else:
                 jobForm.itemVal.tick()
+                print("Item PAss")
         def psuButtonCheck():
             if jobForm.psuButtonGroup.checkedId() == -1:
                 jobForm.psuVal.error()
@@ -175,17 +178,21 @@ class mainInterface(QWidget):
             x=0
             for i in errorFunctions:
                 print(i,x)
-                if x == 8 and jobForm.importantDataGrp.checkedId() != -2:
+                if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
                     print ("Passing")
+                    x = x+1
                     jobForm.importantDataCheckVal.tick()
                     pass
                 else:
                     i()
+                    x = x+1
                 if self.errorsDetected == True:
                     self.statusBar.showMessage("Fix Errors")
                     break
-                else:
-                    self.personalDeets(jobForm.jobNoEdit.text())
+                elif self.errorsDetected == False and x == 10:
+                    print("Writing to File")
+                    writeToFile()
+                    #self.personalDeets(jobForm.jobNoEdit.text())
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
             self.jobNum = int(jobNoFile.read())
@@ -201,10 +208,83 @@ class mainInterface(QWidget):
         jobForm.importantDataGrp.buttonClicked.connect(jobForm.importantDataChecked)
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
+   
+    def getJobNumber(self, nextFunction):
+        searchWidget = findJobWidget(self)
+        self.jobSearchTitle = QLabel("Find a Job")
+        #self.titleLayout.addWidget(self.jobSearchTitle)
+        self.centralWidget.addWidget(searchWidget)
+        self.centralWidget.setCurrentWidget(searchWidget)
+        def errorChecking():
+            print (len(searchWidget.searchField.text()))
+            if len(searchWidget.searchField.text()) == 6:
+                print("success")
+                if nextFunction == 1:
+                    self.editJobDetails(int(searchWidget.searchField.text()))
+                elif nextFunction == 2:
+                    self.addToJob(int(searchWidget.searchField.text()))
+        searchWidget.searchBtn.clicked.connect(errorChecking)
+    def editPersonalDeets(self):
+        detailsForm = custDetailForm(False)
+        print(self.readFile)
+        detailsForm.nameEdit.setText(self.readFile[8])
+        detailsForm.pcEdit.setText(self.readFile[9])
+        detailsForm.addrLineOne.setText(self.readFile[10])
+        detailsForm.addrLineTwo.setText(self.readFile[11])
+        self.centralWidget.addWidget(detailsForm)
+        self.centralWidget.setCurrentWidget(detailsForm)
+    
+    def editJobDetails(self, jobNo):
+        jobForm = jobDisplayWidget(int(jobNo))
+        #popul8
+        origFile = open('.'+str(jobNo))
+        self.readFile = origFile.readlines() #load file into list
+        print("FIle:",self.readFile)
+        staff = self.readFile[1]
+        custItems = self.readFile[2]
+        if 'N/A' in self.readFile[3]:
+            jobForm.psuNA.setChecked(1)
+        elif 'No' in self.readFile[3]:
+            jobForm.psuNo.setChecked(1)
+        else:
+            jobForm.psuYes.setChecked(1)
+        itemCondition = self.readFile[4]
+        custProblem = self.readFile[5]
+        if "No" in self.readFile[6]:
+            jobForm.passwordCheckNo.setChecked(1)
+        elif "Yes" in self.readFile[6]:
+            jobForm.passwordCheckYes.setChecked(1)
+            jobForm.passwords.setText(self.readFile[7])
+        print(origFile.read())
+        if 'No' in self.readFile[8]:
+            jobForm.importantDataCheckNo.setChecked(1)
+        else:
+            jobForm.importantDataCheckYes.setChecked(1)
+            jobForm.importantData.setReadOnly(False)
+            jobForm.importantData.setText(self.readFile[9])
+        if 'No' in self.readFile[10]:
+            jobForm.dataBackupCheckNo.setChecked(1)
+        else:
+            jobForm.dataBackupCheckYes.setChecked(1)
+        jobForm.itemEdit.setText(custItems)
+        jobForm.staffEdit.setText(staff)
+        jobForm.itemEdit.setCursorPosition(0)
+        #jobForm.psuButtonGroup.setcheckedId(custPsu)
+        jobForm.condition.setText(itemCondition)
+        jobForm.problemEdit.setText(custProblem)
+        
+        self.centralWidget.addWidget(jobForm)
+        print("Editing Job",int(jobNo))
+        self.centralWidget.setCurrentWidget(jobForm)
+        jobForm.nextButton.clicked.connect(self.editPersonalDeets)
+
+
+    
     def addToJob(self, jobNo):
         jobProgress = jobProgressWidget(jobNo)
         self.centralWidget.addWidget(jobProgress)
         self.centralWidget.setCurrentWidget(jobProgress)
+    
     def goHome(self):
         titleWidget = self.centralWidget.currentWidget()
         if "findJob" in str(titleWidget):
@@ -216,16 +296,29 @@ class mainInterface(QWidget):
             sip.delete(self.progressWidget) #Steals C++ delete function
             self.progressWidget = None
         self.centralWidget.setCurrentWidget(self.buttons)
+    
     def personalDeets(self, jobNum):
-        print("Job No:",jobNum)
+        print("Job 1No:",jobNum)
         def writeToFile():
             custName = detailsForm.nameEdit.text()
+            if self.emailPresent:
+                custEmail = detailsForm.emailAddr.text()
+            else:
+                custEmail = "None"
+            if self.phonePresent:
+                custPhoneNo = detailsForm.phoneNo.text()
+            else:
+                custPhoneNo = "None"
+            custMobileNo = detailsForm.mobileNo.text()
+            custPC = detailsForm.pcLineEdit.text()
             custAddrOne = detailsForm.addrLineOne.text()
             custAddrTwo = detailsForm.addrLineTwo.text()
-            custPC = detailsForm.pcLineEdit.text()
-
+            
             fileSaveTo = open("."+str(jobNum), "a")
             fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
+            fileSaveTo.write('\n'+custEmail)
+            fileSaveTo.write('\n'+custPhoneNo)
+            fileSaveTo.write('\n'+custMobileNo)
             fileSaveTo.write('\n'+custPC)
             fileSaveTo.write('\n'+custAddrOne)
             fileSaveTo.write('\n'+custAddrTwo)
@@ -243,6 +336,7 @@ class mainInterface(QWidget):
                 pass
             elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
                 detailsForm.emailVal.tick()
+                self.emailPresent = True
             else:
                 detailsForm.emailVal.error()
                 self.errorsDetected = True
@@ -251,31 +345,53 @@ class mainInterface(QWidget):
                 pass
             else:
                 phoneFull = detailsForm.phoneNo.text().replace(" ","")
-                if phoneFull.isdigit() and phoneFull[0] == 0 and phoneFull.len() == 11:
+                print("HomePhone",phoneFull)
+                print(phoneFull.isdigit(),phoneFull[0], len(phoneFull))
+                if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
                     detailsForm.phoneVal.tick()
+                    self.phonePresent = True
                 else:
                     detailsForm.phoneVal.error()
+        def mobileCheck():
+            if detailsForm.mobileNo.text() == "":
+                detailsForm.mobileVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.mobileVal.tick()
         def pcEditCheck():
             if detailsForm.pcLineEdit.text() == "":
                 self.errorsDetected = True                
                 detailsForm.pcVal.error()
             else:
                 detailsForm.pcVal.tick()
-
-            if detailsForm.addrLineOne.text() == "" or detailsForm.addrLineTwo.text() == "":
-                self.errorsDetected = True
+        def addrOneCheck():
+            if detailsForm.addrLineOne.text() == "":
                 detailsForm.addrLineOneVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineOneVal.tick()
+        def addrTwoCheck():
+            if detailsForm.addrLineTwoVal.error():
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineTwoVal.tick()
         def errorChecking():
-            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, pcEditCheck]
+            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, mobileCheck,
+                                pcEditCheck, addrOneCheck, addrTwoCheck]
             self.errorsDetected = False
             x = 0
             for i in errorFunctions:
                 print(i,x)
                 i()
+                x = x+1
                 if self.errorsDetected == True:
                     self.statusBar.showMessage("Fix Errors")
                     print("ERRORS")
                     break
+                elif self.errorsDetected == False and x == 7:
+                    print("WRote")
+                    writeToFile()
+                    self.goHome()
         detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)

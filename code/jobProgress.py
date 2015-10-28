@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QTableWidget,
-        QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout)
+from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTableWidget,
+        QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout,
+        QGroupBox)
 from PyQt5.QtCore import Qt
 
 class customTableWidget(QTableWidget):
@@ -19,7 +20,8 @@ class jobProgressWidget(QWidget):
     def __init__(self, jobNumber, parent=None):
         super(jobProgressWidget, self).__init__(parent)
         self.jobNumber = jobNumber
-        layout = QFormLayout(self)
+        layout = QHBoxLayout()
+
         jobNoLabel = QLabel('Job Number:')
         jobNoEdit = QLineEdit(self)
         jobNoEdit.setReadOnly(True)
@@ -27,13 +29,18 @@ class jobProgressWidget(QWidget):
 
         jobNotesLabel = QLabel('General Job\nNotes:')
         self.jobNotesEdit = QTextEdit()
+        jobTitleBox = QGroupBox("Job Number")
+        jobLayout = QHBoxLayout()
+        jobLayout.addWidget(jobNoEdit)
+        jobTitleBox.setLayout(jobLayout)
+        
 
         partsLabel = QLabel('Parts Used/\nWork Done:')
         self.partsTable = customTableWidget()
         self.partsTable.setRowCount(1)
         self.partsTable.setColumnCount(3)
-        tableHeaders = ["Item","Cost ExVat", "Total"]
-        self.partsTable.setHorizontalHeaderLabels(tableHeaders)
+        partsHeaders = ["Item","Cost ExVat", "Total"]
+        self.partsTable.setHorizontalHeaderLabels(partsHeaders)
         self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.partsTable.cellChanged.connect(self.updateTotals)
     
@@ -59,10 +66,27 @@ class jobProgressWidget(QWidget):
         tableBox = QVBoxLayout()
         tableBox.addWidget(self.partsTable)
         tableBox.addLayout(totalAndSpace)
-        layout.addRow(jobNoLabel, jobNoEdit)
-        layout.addRow(jobNotesLabel, self.jobNotesEdit)
-        layout.addRow(partsLabel, tableBox)
+        tableTitleBox = QGroupBox("Parts Used/Work Done")
+        tableTitleBox.setLayout(tableBox)
 
+        leftLayout = QVBoxLayout()
+        leftLayout.addWidget(jobTitleBox)
+        leftLayout.addWidget(tableTitleBox)
+
+        self.callsTable = customTableWidget()
+        self.callsTable.setRowCount(1)
+        self.callsTable.setColumnCount(4)
+        callsHeaders = ["Engineer","Date","Time","Details"]
+        self.callsTable.setHorizontalHeaderLabels(callsHeaders)
+        self.callsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
+        callsBox = QVBoxLayout()
+        callsBox.addWidget(self.callsTable)
+        callsTitleBox = QGroupBox("Call Log")
+        callsTitleBox.setLayout(callsBox)
+
+        layout.addLayout(leftLayout)
+        layout.addWidget(callsTitleBox)
         self.setLayout(layout)
     def updateTotals(self):
         count = 0
