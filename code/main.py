@@ -184,6 +184,8 @@ class mainInterface(QWidget):
                 if self.errorsDetected == True:
                     self.statusBar.showMessage("Fix Errors")
                     break
+                else:
+                    self.personalDeets(jobForm.jobNoEdit.text())
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
             self.jobNum = int(jobNoFile.read())
