@@ -12,6 +12,7 @@ from buttons import buttonsWidget
 from jobDisplay import jobDisplayWidget
 from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
+from callLog import callLogWidget
 #from PyKde4.kdeui import KIcon
 
 
@@ -25,6 +26,7 @@ class mainInterface(QWidget):
         self.buttons.newJobButton.clicked.connect(self.newJob)
         self.buttons.editJobButton.clicked.connect(lambda: self.getJobNumber(1))
         self.buttons.addToJobButton.clicked.connect(lambda: self.getJobNumber(2))
+        self.buttons.callLogButton.clicked.connect(lambda: self.getJobNumber(3))
         self.centralWidget.addWidget(self.buttons)
         
         #self.progressWidget = progressWidget()
@@ -60,9 +62,9 @@ class mainInterface(QWidget):
         def writeToFile():
             staff = jobForm.staffEdit.text()
             custItems = jobForm.itemEdit.text()
-            if jobForm.psuButtonGroup.checkedId == -2:
+            if jobForm.psuButtonGroup.checkedId() == -2:
                 custPsu = "Yes"
-            elif jobForm.psuButtonGroup.checkedId == -3:
+            elif jobForm.psuButtonGroup.checkedId() == -3:
                 custPsu = "No"
             else:
                 custPsu = "N/A"
@@ -77,12 +79,13 @@ class mainInterface(QWidget):
             else:
                 print("No Password")
                 custPasswords = "No"
-            custDataField = ""
+                custPasswordField = ""
             if jobForm.importantDataGrp.checkedId() == -2:
                 custData = "Yes"
                 custDataField = jobForm.importantData.text()
             else:
                 custData = "No"
+                custDataField = ""
             if jobForm.dataBackupGrp.checkedId() == -1:
                 custBackup = "Yes"
             else:
@@ -94,12 +97,12 @@ class mainInterface(QWidget):
             fileSaveTo.write("\n"+custPsu)
             fileSaveTo.write("\n"+itemCondition)
             fileSaveTo.write("\n"+custProblem)
+            fileSaveTo.write("\n"+custPasswords)
             fileSaveTo.write("\n"+custPasswordField)
             fileSaveTo.write("\n"+custData)
             fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
             fileSaveTo.write("\n"+custBackup)
             self.statusBar.showMessage("job Details saved")
-            self.personalDeets(jobForm.jobNumber)
             statusText = "No Eeorrs"
         def staffEditCheck():
            if jobForm.staffEdit.text() == "":
@@ -169,7 +172,8 @@ class mainInterface(QWidget):
             else:
                 jobForm.dataBackupCheckVal.tick()
             
-        def errorChecking():    
+        def errorChecking():   
+            print("id", jobForm.psuButtonGroup.checkedId())
             errorFunctions = [staffEditCheck, itemEditCheck, psuButtonCheck, 
                                 conditionCheck,problemEditCheck, passwordsBoxCheck,
                                 passwordsCheck, importantDataBoxCheck, 
@@ -192,6 +196,7 @@ class mainInterface(QWidget):
                 elif self.errorsDetected == False and x == 10:
                     print("Writing to File")
                     writeToFile()
+                    self.personalDeets(jobForm.jobNumber)
                     #self.personalDeets(jobForm.jobNoEdit.text())
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
@@ -223,17 +228,24 @@ class mainInterface(QWidget):
                     self.editJobDetails(int(searchWidget.searchField.text()))
                 elif nextFunction == 2:
                     self.addToJob(int(searchWidget.searchField.text()))
+                elif nextFunction == 3:
+                    self.jobCalls(int(searchWidget.searchField.text()))
         searchWidget.searchBtn.clicked.connect(errorChecking)
     def editPersonalDeets(self):
         detailsForm = custDetailForm(False)
         print(self.readFile)
-        detailsForm.nameEdit.setText(self.readFile[8])
-        detailsForm.pcEdit.setText(self.readFile[9])
-        detailsForm.addrLineOne.setText(self.readFile[10])
-        detailsForm.addrLineTwo.setText(self.readFile[11])
+        detailsForm.nameEdit.setText(self.readFile[12])
+        if self.readFile[13] != "":
+            detailsForm.emailAddr.setText(self.readFile[13])
+        if self.readFile[14] != "":
+            detailsForm.phoneNo.setText(self.readFile[14])
+        detailsForm.mobileNo.setText(self.readFile[15])
+        detailsForm.pcEdit.setText(self.readFile[16])
+        detailsForm.addrLineOne.setText(self.readFile[17])
+        detailsForm.addrLineTwo.setText(self.readFile[18])
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
-    
+         
     def editJobDetails(self, jobNo):
         jobForm = jobDisplayWidget(int(jobNo))
         #popul8
@@ -276,8 +288,9 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(jobForm)
         print("Editing Job",int(jobNo))
         self.centralWidget.setCurrentWidget(jobForm)
-        jobForm.nextButton.clicked.connect(self.editPersonalDeets)
+        jobForm.nextButton.clicked.connect(self.newJob.errorChecking())
 
+        
 
     
     def addToJob(self, jobNo):
@@ -304,11 +317,11 @@ class mainInterface(QWidget):
             if self.emailPresent:
                 custEmail = detailsForm.emailAddr.text()
             else:
-                custEmail = "None"
+                custEmail = ""
             if self.phonePresent:
                 custPhoneNo = detailsForm.phoneNo.text()
             else:
-                custPhoneNo = "None"
+                custPhoneNo = ""
             custMobileNo = detailsForm.mobileNo.text()
             custPC = detailsForm.pcLineEdit.text()
             custAddrOne = detailsForm.addrLineOne.text()
@@ -333,7 +346,7 @@ class mainInterface(QWidget):
                 detailsForm.nameVal.tick()
         def emailCheck():
             if detailsForm.emailAddr.text() == "":
-                pass
+                self.emailPresent = False
             elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
                 detailsForm.emailVal.tick()
                 self.emailPresent = True
@@ -342,7 +355,7 @@ class mainInterface(QWidget):
                 self.errorsDetected = True
         def phoneCheck():
             if detailsForm.phoneNo.text() == "":
-                pass
+                self.phonePresent = False
             else:
                 phoneFull = detailsForm.phoneNo.text().replace(" ","")
                 print("HomePhone",phoneFull)
@@ -396,6 +409,12 @@ class mainInterface(QWidget):
         detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
+
+    def jobCalls(self, jobNo):
+        callLog = callLogWidget(jobNo)
+        self.centralWidget.addWidget(callLog)
+        self.centralWidget.setCurrentWidget(callLog)
+    
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

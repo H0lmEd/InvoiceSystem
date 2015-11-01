@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTableWidget
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QSize, Qt
 import os
@@ -23,3 +23,18 @@ class validationImage(QWidget):
         
         self.layout.addWidget(self.label)
         self.setLayout(self.layout)
+
+class customTableWidget(QTableWidget):
+    def __init__(self):
+        QTableWidget.__init__(self)
+
+    def keyPressEvent(QKeyEvent, event):
+        print(event.key())
+        if event.key() == 16777220:
+            print("ENTER PRESSED")
+            super().insertRow(1)
+            super().setCurrentCell((super().currentRow()+1), 0)
+            #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
+            #jobProgressWidget.cellWatcher
+
+

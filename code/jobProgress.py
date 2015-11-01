@@ -2,19 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTa
         QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout,
         QGroupBox)
 from PyQt5.QtCore import Qt
-
-class customTableWidget(QTableWidget):
-    def __init__(self):
-        QTableWidget.__init__(self)
-
-    def keyPressEvent(QKeyEvent, event):
-        print(event.key())
-        if event.key() == 16777220:
-            print("ENTER PRESSED")
-            super().insertRow(1)
-            super().setCurrentCell((super().currentRow()+1), 0)
-            #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
-            #jobProgressWidget.cellWatcher
+from customWidgets import customTableWidget
 
 class jobProgressWidget(QWidget):
     def __init__(self, jobNumber, parent=None):
@@ -26,9 +14,13 @@ class jobProgressWidget(QWidget):
         jobNoEdit = QLineEdit(self)
         jobNoEdit.setReadOnly(True)
         jobNoEdit.setPlaceholderText(str(self.jobNumber))
-
-        jobNotesLabel = QLabel('General Job\nNotes:')
+        
+        notesTitleBox = QGroupBox("General Job Notes")
         self.jobNotesEdit = QTextEdit()
+        notesLayout = QHBoxLayout()
+        notesLayout.addWidget(self.jobNotesEdit)
+        notesTitleBox.setLayout(notesLayout)
+
         jobTitleBox = QGroupBox("Job Number")
         jobLayout = QHBoxLayout()
         jobLayout.addWidget(jobNoEdit)
@@ -38,8 +30,8 @@ class jobProgressWidget(QWidget):
         partsLabel = QLabel('Parts Used/\nWork Done:')
         self.partsTable = customTableWidget()
         self.partsTable.setRowCount(1)
-        self.partsTable.setColumnCount(3)
-        partsHeaders = ["Item","Cost ExVat", "Total"]
+        self.partsTable.setColumnCount(2)
+        partsHeaders = ["Item","Cost ExVat"]
         self.partsTable.setHorizontalHeaderLabels(partsHeaders)
         self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.partsTable.cellChanged.connect(self.updateTotals)
@@ -48,45 +40,24 @@ class jobProgressWidget(QWidget):
         self.subTotal = QLabel("$Money")
         self.taxAmount = QLabel("$Less Mpney")
         self.totalAmount = QLabel("$More Money")
-        updateButton = QPushButton("Update Total")
-        updateButton.clicked.connect(self.updateTotals)
 
         totalLayout = QVBoxLayout()
         totalLayout.addWidget(self.subTotal)
         totalLayout.addWidget(self.taxAmount)
         totalLayout.addWidget(self.totalAmount)
 
-        totalSpace = QVBoxLayout()
-        totalSpace.addWidget(updateButton)
-        totalSpace.addStretch(1)
-        totalAndSpace = QHBoxLayout()
-        totalAndSpace.addLayout(totalSpace)
-        totalAndSpace.addLayout(totalLayout)
-
         tableBox = QVBoxLayout()
         tableBox.addWidget(self.partsTable)
-        tableBox.addLayout(totalAndSpace)
+        tableBox.addLayout(totalLayout)
         tableTitleBox = QGroupBox("Parts Used/Work Done")
         tableTitleBox.setLayout(tableBox)
 
         leftLayout = QVBoxLayout()
         leftLayout.addWidget(jobTitleBox)
-        leftLayout.addWidget(tableTitleBox)
-
-        self.callsTable = customTableWidget()
-        self.callsTable.setRowCount(1)
-        self.callsTable.setColumnCount(4)
-        callsHeaders = ["Engineer","Date","Time","Details"]
-        self.callsTable.setHorizontalHeaderLabels(callsHeaders)
-        self.callsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        
-        callsBox = QVBoxLayout()
-        callsBox.addWidget(self.callsTable)
-        callsTitleBox = QGroupBox("Call Log")
-        callsTitleBox.setLayout(callsBox)
+        leftLayout.addWidget(notesTitleBox)
 
         layout.addLayout(leftLayout)
-        layout.addWidget(callsTitleBox)
+        layout.addWidget(tableTitleBox)
         self.setLayout(layout)
     def updateTotals(self):
         count = 0
