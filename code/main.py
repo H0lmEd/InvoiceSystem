@@ -19,39 +19,42 @@ from callLog import callLogWidget
 class mainInterface(QWidget):
     def __init__(self):
         super().__init__()
-        mainLayout = QVBoxLayout()
+        centralLayout = QVBoxLayout()
+        mainLayout = QHBoxLayout()
         self.centralWidget = QStackedWidget()
-
         self.buttons = buttonsWidget(self)
-        self.buttons.newJobButton.clicked.connect(self.newJob)
-        self.buttons.editJobButton.clicked.connect(lambda: self.getJobNumber(1))
-        self.buttons.addToJobButton.clicked.connect(lambda: self.getJobNumber(2))
-        self.buttons.callLogButton.clicked.connect(lambda: self.getJobNumber(3))
-        self.centralWidget.addWidget(self.buttons)
+        
+        self.buttons.newJobButton.triggered.connect(self.newJob)
+        self.buttons.editJobButton.triggered.connect(lambda: self.getJobNumber(1))
+        self.buttons.addToJobButton.triggered.connect(lambda: self.getJobNumber(2))
+        self.buttons.callLogButton.triggered.connect(lambda: self.getJobNumber(3))
+        #self.centralWidget.addWidget(self.buttons)
         
         #self.progressWidget = progressWidget()
         iconFolder = os.path.join(os.path.dirname(__file__), os.pardir, "icons/")
 
         self.titleLayout = QHBoxLayout()
-        horizLine = QFrame()
-        horizLine.setFrameShape(QFrame.HLine)
-        horizLine.setFrameShadow(QFrame.Sunken)
+        vertLine = QFrame()
+        vertLine.setFrameShape(QFrame.VLine)
+        vertLine.setFrameShadow(QFrame.Sunken)
+
         homeButton = QToolButton(self)
         homeButton.setToolButtonStyle(2) #Text beside icon
         homeButton.setText("Back")
         homeButton.setIcon(QIcon(iconFolder + 'back.png'))
         homeButton.setIconSize(QSize(12, 12))
         homeButton.clicked.connect(self.goHome)
+
         self.statusBar = QStatusBar(self)
         self.statusBar.showMessage("Stat")
-        jobButton = QPushButton("POST")
-        jobButton.clicked.connect(self.personalDeets)
-        mainLayout.addLayout(self.titleLayout)
-        mainLayout.addWidget(horizLine)
-        mainLayout.addWidget(self.centralWidget)
-        mainLayout.addWidget(self.statusBar)
-        mainLayout.addWidget(jobButton)
-        mainLayout.addWidget(homeButton)
+        
+        centralLayout.addWidget(self.centralWidget)
+        centralLayout.addWidget(self.statusBar)
+        centralLayout.addWidget(homeButton)
+
+        mainLayout.addWidget(self.buttons)
+        mainLayout.addWidget(vertLine)
+        mainLayout.addLayout(centralLayout)
         self.setLayout(mainLayout)
         #self.setGeometry(790, 365, 390, 365)
         self.resize(600, 600)
@@ -59,6 +62,7 @@ class mainInterface(QWidget):
         #line = QFrame()
         #lane.setFrame
     def newJob(self):
+        print("NEW JOB")
         def writeToFile():
             staff = jobForm.staffEdit.text()
             custItems = jobForm.itemEdit.text()
@@ -197,7 +201,9 @@ class mainInterface(QWidget):
                     break
                 elif self.errorsDetected == False and x == 10:
                     print("Writing to File")
-                    self.personalDeets(jobForm.jobNoEdit.text())
+                    writeToFile()
+                    print("Job No:", jobForm.jobNoEdit.text())
+                    self.personalDeets(jobForm.jobNumber)
         
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
@@ -216,6 +222,8 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(jobForm)
    
     def getJobNumber(self, nextFunction):
+        
+        print("nxt Fun", nextFunction)
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
         #self.titleLayout.addWidget(self.jobSearchTitle)
@@ -248,6 +256,7 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(detailsForm)
          
     def editJobDetails(self, jobNo):
+        print("EDITN JOB")
         def errorChecking():
             self.staffEdit = jobForm.staffEdit
             if self.jobDisplayErrorChecking(jobNo) == 1:

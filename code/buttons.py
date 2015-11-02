@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QToolButton, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QToolButton, QSizePolicy, QActionGroup, QAction, QToolBar
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
 import os
@@ -13,40 +13,43 @@ class buttonsWidget(QWidget):
         botLayout = QHBoxLayout()
         vLayout = QVBoxLayout()
 
-        self.newJobButton = QToolButton(self)
-        self.newJobButton.setToolButtonStyle(3) #text below icon
+        self.newJobButton = QAction(self)
         self.newJobButton.setText("New Job")
         self.newJobButton.setIcon(QIcon(iconFolder+'new.png'))
-        self.newJobButton.setAutoRaise(True)
-        self.newJobButton.setIconSize(QSize(64, 64))
+        self.newJobButton.setCheckable(True)
         print("PAth", iconFolder)
 
-        self.editJobButton = QToolButton(self)
-        self.editJobButton.setToolButtonStyle(3) #text below icon
+        self.editJobButton = QAction(self)
         self.editJobButton.setText("View/Edit a Job")
         self.editJobButton.setIcon(QIcon(iconFolder+'find.png'))
-        self.editJobButton.setAutoRaise(True)
-        self.editJobButton.setIconSize(QSize(64, 64))
+        self.editJobButton.setCheckable(True)
 
-        self.addToJobButton = QToolButton(self)
-        self.addToJobButton.setToolButtonStyle(3)
-        self.addToJobButton.setAutoRaise(True)
+        self.addToJobButton = QAction(self)
         self.addToJobButton.setText("Add Job Progress")
         self.addToJobButton.setIcon(QIcon(iconFolder+'find.png'))
-        self.addToJobButton.setIconSize(QSize(64, 64))
+        self.addToJobButton.setCheckable(True)
 
-        self.callLogButton = QToolButton(self)
-        self.callLogButton.setToolButtonStyle(3)
-        self.callLogButton.setAutoRaise(True)
+        self.callLogButton = QAction(self)
         self.callLogButton.setText("Create Invoice")
         self.callLogButton.setIcon(QIcon(iconFolder+'find.png'))
-        self.callLogButton.setIconSize(QSize(64, 64))
+        self.callLogButton.setCheckable(True)
+        
+        self.toolBar = QToolBar()
+        self.toolBar.setMovable(False)
+        self.toolBar.setIconSize(QSize(64, 64))
+        self.toolBar.setToolButtonStyle(3)
+        self.toolBar.setOrientation(0x2)
+        #addToolBar(toolBar)
+        self.toolBar.addAction(self.newJobButton)
+        self.toolBar.addAction(self.editJobButton)
+        self.toolBar.addAction(self.addToJobButton)
+        self.toolBar.addAction(self.callLogButton)
+        
+        bGroup = QActionGroup(self)
+        bGroup.addAction(self.newJobButton)
+        bGroup.addAction(self.editJobButton)
+        bGroup.addAction(self.addToJobButton)
+        bGroup.addAction(self.callLogButton)
+        vLayout.addWidget(self.toolBar)
 
-        topLayout.addWidget(self.newJobButton)
-        topLayout.addWidget(self.editJobButton)
-        botLayout.addWidget(self.addToJobButton)
-        botLayout.addWidget(self.callLogButton)
-
-        vLayout.addLayout(topLayout)
-        vLayout.addLayout(botLayout)
         self.setLayout(vLayout)

@@ -77,6 +77,8 @@ class jobProgressWidget(QWidget):
         count = 0
         rount = 0
         totalExVat = float(0.00)
+        taxTotal = float(0.00)
+        total = float(0.00)
         print (self.partsTable.rowCount())
         
         for x in range(self.partsTable.rowCount()):
@@ -85,13 +87,15 @@ class jobProgressWidget(QWidget):
                 print ('Cell Number:', i, 'Row Number:',x)
                 if i == 1:
                     try:
-                        totalExVat = totalExVat + float(self.partsTable.item(x,i).text())
+                        totalExVat = float(totalExVat) + float(self.partsTable.item(x,i).text())
+                        totalExVat = float(format(totalExVat, '.2f'))
+                        taxTotal = float(format((totalExVat*0.2), '0.2f'))
+                        total = float(format((totalExVat*1.2), '0.2f'))
                     except AttributeError:
                         print("Attrubute ERror")
                     except ValueError:
                         print("Value Error")
         pound = u'\u00A3'
-
         self.subTotal.setText(pound+str(totalExVat))
-        self.taxAmount.setText(pound+str((totalExVat*0.2)))
-        self.totalAmount.setText(pound+str((totalExVat*1.2)))
+        self.taxAmount.setText(pound+str(taxTotal))
+        self.totalAmount.setText(pound+str(total))
