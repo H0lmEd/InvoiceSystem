@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTableWidget
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 import os
 
 class validationImage(QWidget):
@@ -27,13 +27,16 @@ class validationImage(QWidget):
 class customTableWidget(QTableWidget):
     def __init__(self):
         QTableWidget.__init__(self)
-
+        entered = pyqtSignal()
+    
     def keyPressEvent(QKeyEvent, event):
         print(event.key())
         if event.key() == 16777220:
             print("ENTER PRESSED")
-            super().insertRow(1)
+            newRow = int(super().currentRow()) + 1
+            super().insertRow(newRow)
             super().setCurrentCell((super().currentRow()+1), 0)
+            print('Signal soon to be Emitted')
             #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
             #jobProgressWidget.cellWatcher
 

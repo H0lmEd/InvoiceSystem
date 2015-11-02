@@ -15,4 +15,4 @@ class findJobWidget(QWidget):
         self.searchLayout.addWidget(self.searchBtn)
         self.layout.addLayout(self.searchLayout)
         self.setLayout(self.layout)
-
+        self.searchField.returnPressed.connect(lambda: self.searchBtn.click())

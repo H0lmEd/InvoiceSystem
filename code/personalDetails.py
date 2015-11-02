@@ -70,7 +70,9 @@ class custDetailForm(QWidget):
                 
                 reply = QMessageBox.critical(self, "Error", 
                         "Check your info and try again", QMessageBox.Ok)
-        
+            except urllib.error.URLError:
+                reply = QMessageBox.critical(self, "Error",
+                        "No Internet connection detected.\nCheck your connection and try again", QMessageBox.Ok)
         self.pcVal = validationImage(self)
         if newCustomer==True:
             self.pcEdit = QHBoxLayout()

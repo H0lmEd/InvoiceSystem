@@ -104,12 +104,14 @@ class mainInterface(QWidget):
             fileSaveTo.write("\n"+custBackup)
             self.statusBar.showMessage("job Details saved")
             statusText = "No Eeorrs"
+        
         def staffEditCheck():
-           if jobForm.staffEdit.text() == "":
+            print("Staff",jobForm.staffEdit.text())
+            if jobForm.staffEdit.text() == "":
                 jobForm.staffVal.error()
                 
                 self.errorsDetected = True
-           else:
+            else:
                 jobForm.staffVal.tick()
         def itemEditCheck():
             print("Item Check")
@@ -171,7 +173,6 @@ class mainInterface(QWidget):
                 self.errorsDetected = True
             else:
                 jobForm.dataBackupCheckVal.tick()
-            
         def errorChecking():   
             print("id", jobForm.psuButtonGroup.checkedId())
             errorFunctions = [staffEditCheck, itemEditCheck, psuButtonCheck, 
@@ -182,6 +183,7 @@ class mainInterface(QWidget):
             x=0
             for i in errorFunctions:
                 print(i,x)
+                print("Checking for Errors")
                 if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
                     print ("Passing")
                     x = x+1
@@ -195,9 +197,8 @@ class mainInterface(QWidget):
                     break
                 elif self.errorsDetected == False and x == 10:
                     print("Writing to File")
-                    writeToFile()
-                    self.personalDeets(jobForm.jobNumber)
-                    #self.personalDeets(jobForm.jobNoEdit.text())
+                    self.personalDeets(jobForm.jobNoEdit.text())
+        
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
             self.jobNum = int(jobNoFile.read())
@@ -247,6 +248,10 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(detailsForm)
          
     def editJobDetails(self, jobNo):
+        def errorChecking():
+            self.staffEdit = jobForm.staffEdit
+            if self.jobDisplayErrorChecking(jobNo) == 1:
+                print ("No Errors RETURNED")
         jobForm = jobDisplayWidget(int(jobNo))
         #popul8
         origFile = open('.'+str(jobNo))
@@ -288,10 +293,12 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(jobForm)
         print("Editing Job",int(jobNo))
         self.centralWidget.setCurrentWidget(jobForm)
-        jobForm.nextButton.clicked.connect(self.newJob.errorChecking())
+        jobForm.nextButton.clicked.connect(lambda: errorChecking())
 
         
-
+    def jobDisplayErrorChecking(self, jobNo):
+        jobForm = jobDisplayWidget(int(jobNo))
+                 
     
     def addToJob(self, jobNo):
         jobProgress = jobProgressWidget(jobNo)
