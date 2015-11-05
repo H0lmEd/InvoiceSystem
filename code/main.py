@@ -9,6 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from findJob import findJobWidget
 from buttons import buttonsWidget
+from startScreen import startScreenForm
 from jobDisplay import jobDisplayWidget
 from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
@@ -28,39 +29,30 @@ class mainInterface(QWidget):
         self.buttons.editJobButton.triggered.connect(lambda: self.getJobNumber(1))
         self.buttons.addToJobButton.triggered.connect(lambda: self.getJobNumber(2))
         self.buttons.callLogButton.triggered.connect(lambda: self.getJobNumber(3))
-        #self.centralWidget.addWidget(self.buttons)
         
-        #self.progressWidget = progressWidget()
-        iconFolder = os.path.join(os.path.dirname(__file__), os.pardir, "icons/")
-
-        self.titleLayout = QHBoxLayout()
         vertLine = QFrame()
         vertLine.setFrameShape(QFrame.VLine)
         vertLine.setFrameShadow(QFrame.Sunken)
-
-        homeButton = QToolButton(self)
-        homeButton.setToolButtonStyle(2) #Text beside icon
-        homeButton.setText("Back")
-        homeButton.setIcon(QIcon(iconFolder + 'back.png'))
-        homeButton.setIconSize(QSize(12, 12))
-        homeButton.clicked.connect(self.goHome)
 
         self.statusBar = QStatusBar(self)
         self.statusBar.showMessage("Stat")
         
         centralLayout.addWidget(self.centralWidget)
         centralLayout.addWidget(self.statusBar)
-        centralLayout.addWidget(homeButton)
 
         mainLayout.addWidget(self.buttons)
         mainLayout.addWidget(vertLine)
         mainLayout.addLayout(centralLayout)
         self.setLayout(mainLayout)
-        #self.setGeometry(790, 365, 390, 365)
-        self.resize(600, 600)
-    #def hzLine(self):
-        #line = QFrame()
-        #lane.setFrame
+        self.resize(800, 600)
+        self.startScreen()
+
+    def startScreen(self):
+        screen = startScreenForm()
+        self.centralWidget.addWidget(screen)
+        self.centralWidget.setCurrentWidget(screen)
+   
+       
     def newJob(self):
         print("NEW JOB")
         def writeToFile():
@@ -94,7 +86,7 @@ class mainInterface(QWidget):
                 custBackup = "Yes"
             else:
                 custBackup = "No"
-            fileSaveTo = open("."+str(jobForm.jobNumber), "a")
+            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
             fileSaveTo.write("JOBDETAILS")
             fileSaveTo.write("\n"+staff)
             fileSaveTo.write("\n"+custItems)
@@ -241,6 +233,99 @@ class mainInterface(QWidget):
                     self.jobCalls(int(searchWidget.searchField.text()))
         searchWidget.searchBtn.clicked.connect(errorChecking)
     def editPersonalDeets(self):
+        def writeToFile():
+            custName = detailsForm.nameEdit.text()
+            if self.emailPresent:
+                custEmail = detailsForm.emailAddr.text()
+            else:
+                custEmail = ""
+            if self.phonePresent:
+                custPhoneNo = detailsForm.phoneNo.text()
+            else:
+                custPhoneNo = ""
+            custMobileNo = detailsForm.mobileNo.text()
+            custPC = detailsForm.pcLineEdit.text()
+            custAddrOne = detailsForm.addrLineOne.text()
+            custAddrTwo = detailsForm.addrLineTwo.text()
+            
+            fileSaveTo = open("."+str(jobNum), "a")
+            fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
+            fileSaveTo.write('\n'+custEmail)
+            fileSaveTo.write('\n'+custPhoneNo)
+            fileSaveTo.write('\n'+custMobileNo)
+            fileSaveTo.write('\n'+custPC)
+            fileSaveTo.write('\n'+custAddrOne)
+            fileSaveTo.write('\n'+custAddrTwo)
+            fileSaveTo.close()
+            self.statusBar.showMessage("Job Details Saved")
+                
+        def nameEditCheck():
+            if detailsForm.nameEdit.text() == "":
+                detailsForm.nameVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.nameVal.tick()
+        def emailCheck():
+            if detailsForm.emailAddr.text() == "":
+                self.emailPresent = False
+            elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
+                detailsForm.emailVal.tick()
+                self.emailPresent = True
+            else:
+                detailsForm.emailVal.error()
+                self.errorsDetected = True
+        def phoneCheck():
+            if detailsForm.phoneNo.text() == "":
+                self.phonePresent = False
+            else:
+                phoneFull = detailsForm.phoneNo.text().replace(" ","")
+                print("HomePhone",phoneFull)
+                print(phoneFull.isdigit(),phoneFull[0], len(phoneFull))
+                if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
+                    detailsForm.phoneVal.tick()
+                    self.phonePresent = True
+                else:
+                    detailsForm.phoneVal.error()
+        def mobileCheck():
+            if detailsForm.mobileNo.text() == "":
+                detailsForm.mobileVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.mobileVal.tick()
+        def pcEditCheck():
+            if detailsForm.pcLineEdit.text() == "":
+                self.errorsDetected = True                
+                detailsForm.pcVal.error()
+            else:
+                detailsForm.pcVal.tick()
+        def addrOneCheck():
+            if detailsForm.addrLineOne.text() == "":
+                detailsForm.addrLineOneVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineOneVal.tick()
+        def addrTwoCheck():
+            if detailsForm.addrLineTwoVal.error():
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineTwoVal.tick()
+        def errorChecking():
+            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, mobileCheck,
+                                pcEditCheck, addrOneCheck, addrTwoCheck]
+            self.errorsDetected = False
+            x = 0
+            for i in errorFunctions:
+                print(i,x)
+                i()
+                x = x+1
+                if self.errorsDetected == True:
+                    self.statusBar.showMessage("Fix Errors")
+                    print("ERRORS")
+                    break
+                elif self.errorsDetected == False and x == 7:
+                    print("WRote")
+                    writeToFile()
+         
         detailsForm = custDetailForm(False)
         print(self.readFile)
         detailsForm.nameEdit.setText(self.readFile[12])
@@ -252,28 +337,167 @@ class mainInterface(QWidget):
         detailsForm.pcEdit.setText(self.readFile[16])
         detailsForm.addrLineOne.setText(self.readFile[17])
         detailsForm.addrLineTwo.setText(self.readFile[18])
+        detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
          
     def editJobDetails(self, jobNo):
-        print("EDITN JOB")
-        def errorChecking():
-            self.staffEdit = jobForm.staffEdit
-            if self.jobDisplayErrorChecking(jobNo) == 1:
-                print ("No Errors RETURNED")
+        def writeToFile():
+            staff = jobForm.staffEdit.text()
+            custItems = jobForm.itemEdit.text()
+            if jobForm.psuButtonGroup.checkedId() == -2:
+                custPsu = "Yes"
+            elif jobForm.psuButtonGroup.checkedId() == -3:
+                custPsu = "No"
+            else:
+                custPsu = "N/A"
+            itemCondition = jobForm.condition.text()
+            custProblem = jobForm.problemEdit.toPlainText()
+            custPasswordField = ""
+            print("Passwords",jobForm.passButtonGrp.checkedId())
+            if jobForm.passButtonGrp.checkedId() == -2:
+                print("Password Detected")
+                custPasswords =  "Yes"
+                custPasswordField = jobForm.passwords.toPlainText()
+            else:
+                print("No Password")
+                custPasswords = "No"
+                custPasswordField = ""
+            if jobForm.importantDataGrp.checkedId() == -2:
+                custData = "Yes"
+                custDataField = jobForm.importantData.text()
+            else:
+                custData = "No"
+                custDataField = ""
+            if jobForm.dataBackupGrp.checkedId() == -1:
+                custBackup = "Yes"
+            else:
+                custBackup = "No"
+            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
+            fileSaveTo.write("JOBDETAILS")
+            fileSaveTo.write("\n"+staff)
+            fileSaveTo.write("\n"+custItems)
+            fileSaveTo.write("\n"+custPsu)
+            fileSaveTo.write("\n"+itemCondition)
+            fileSaveTo.write("\n"+custProblem)
+            fileSaveTo.write("\n"+custPasswords)
+            fileSaveTo.write("\n"+custPasswordField)
+            fileSaveTo.write("\n"+custData)
+            fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
+            fileSaveTo.write("\n"+custBackup)
+            self.statusBar.showMessage("job Details saved")
+            statusText = "No Eeorrs"
+
+        def staffEditCheck():
+            print("Staff",jobForm.staffEdit.text())
+            if jobForm.staffEdit.text() == "":
+                jobForm.staffVal.error()
+                
+                self.errorsDetected = True
+            else:
+                jobForm.staffVal.tick()
+        def itemEditCheck():
+            print("Item Check")
+            if jobForm.itemEdit.text() == "":
+                jobForm.itemVal.error()
+                print("Item Error")
+                self.errorsDetected = True
+            else:
+                jobForm.itemVal.tick()
+                print("Item PAss")
+        def psuButtonCheck():
+            if jobForm.psuButtonGroup.checkedId() == -1:
+                jobForm.psuVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.psuVal.tick()
+
+        def conditionCheck():
+            if jobForm.condition.text() == "":
+                jobForm.conditionVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.conditionVal.tick()
+        def problemEditCheck():
+            self.errorsDetected = False
+            if jobForm.problemEdit.toPlainText() == "":
+                jobForm.problemVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.problemVal.tick()
+        def passwordsBoxCheck():
+            if jobForm.passButtonGrp.checkedId() == -1:
+                jobForm.passwordCheckVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.passwordCheckVal.tick()
+        def passwordsCheck():
+            if jobForm.passwords.toPlainText() == "":
+                jobForm.passwordsVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.passwordCheckVal.tick()
+        def importantDataBoxCheck():
+            if jobForm.importantDataGrp.checkedId() == -1:
+                jobForm.importantDataCheckVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.importantDataCheckVal.tick()
+        def importantDataFieldCheck():
+            if jobForm.importantData.text() == "":
+                jobForm.importantDataVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.importantDataVal.tick()
+        def dataBackupCheck():
+            self.errorsDetected = False
+            if jobForm.dataBackupGrp.checkedId() == -1:
+                jobForm.dataBackupCheckVal.error()
+                self.errorsDetected = True
+            else:
+                jobForm.dataBackupCheckVal.tick()
+        def errorChecking():   
+            print("id", jobForm.psuButtonGroup.checkedId())
+            errorFunctions = [staffEditCheck, itemEditCheck, psuButtonCheck, 
+                                conditionCheck,problemEditCheck, passwordsBoxCheck,
+                                passwordsCheck, importantDataBoxCheck, 
+                                importantDataFieldCheck, dataBackupCheck]
+            self.errorsDetected = False
+            x=0
+            for i in errorFunctions:
+                print(i,x)
+                print("Checking for Errors")
+                if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
+                    print ("Passing")
+                    x = x+1
+                    jobForm.importantDataCheckVal.tick()
+                    pass
+                else:
+                    i()
+                    x = x+1
+                if self.errorsDetected == True:
+                    self.statusBar.showMessage("Fix Errors")
+                    break
+                elif self.errorsDetected == False and x == 10:
+                    print("Writing to File")
+                    writeToFile()
+                    print("Job No:", jobForm.jobNoEdit.text())
+                    self.personalDeets(jobForm.jobNumber)
         jobForm = jobDisplayWidget(int(jobNo))
-        #popul8
         origFile = open('.'+str(jobNo))
-        self.readFile = origFile.readlines() #load file into list
-        print("FIle:",self.readFile)
+        self.readFile = []
+        for line in origFile.readlines():
+            line = line.replace("\n","")
+            self.readFile.append(line)
+        print ("New File", self.readFile)
         staff = self.readFile[1]
         custItems = self.readFile[2]
         if 'N/A' in self.readFile[3]:
             jobForm.psuNA.setChecked(1)
         elif 'No' in self.readFile[3]:
-            jobForm.psuNo.setChecked(1)
+            jobForm.psuN.setChecked(1)
         else:
-            jobForm.psuYes.setChecked(1)
+            jobForm.psuY.setChecked(1)
         itemCondition = self.readFile[4]
         custProblem = self.readFile[5]
         if "No" in self.readFile[6]:

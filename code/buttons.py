@@ -7,31 +7,33 @@ import os
 class buttonsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
-        iconFolder = os.path.join(os.path.dirname(__file__), os.pardir, "icons/")
 
-        topLayout = QHBoxLayout()
-        botLayout = QHBoxLayout()
-        vLayout = QVBoxLayout()
+        layout = QVBoxLayout()
+
+        self.homeButton = QAction(self)
+        self.homeButton.setText("Start Page")
+        self.homeButton.setIcon(QIcon.fromTheme("go-home"))
+        self.homeButton.setCheckable(True)
+        self.homeButton.setChecked(True)
 
         self.newJobButton = QAction(self)
         self.newJobButton.setText("New Job")
-        self.newJobButton.setIcon(QIcon(iconFolder+'new.png'))
+        self.newJobButton.setIcon(QIcon.fromTheme("document-new"))
         self.newJobButton.setCheckable(True)
-        print("PAth", iconFolder)
 
         self.editJobButton = QAction(self)
         self.editJobButton.setText("View/Edit a Job")
-        self.editJobButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.editJobButton.setIcon(QIcon.fromTheme("edit-find-replace"))
         self.editJobButton.setCheckable(True)
 
         self.addToJobButton = QAction(self)
         self.addToJobButton.setText("Add Job Progress")
-        self.addToJobButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.addToJobButton.setIcon(QIcon.fromTheme("story-editor"))
         self.addToJobButton.setCheckable(True)
 
         self.callLogButton = QAction(self)
         self.callLogButton.setText("Create Invoice")
-        self.callLogButton.setIcon(QIcon(iconFolder+'find.png'))
+        self.callLogButton.setIcon(QIcon.fromTheme("call-start"))
         self.callLogButton.setCheckable(True)
         
         self.toolBar = QToolBar()
@@ -40,16 +42,18 @@ class buttonsWidget(QWidget):
         self.toolBar.setToolButtonStyle(3)
         self.toolBar.setOrientation(0x2)
         #addToolBar(toolBar)
+        self.toolBar.addAction(self.homeButton)
         self.toolBar.addAction(self.newJobButton)
         self.toolBar.addAction(self.editJobButton)
         self.toolBar.addAction(self.addToJobButton)
         self.toolBar.addAction(self.callLogButton)
         
         bGroup = QActionGroup(self)
+        bGroup.addAction(self.homeButton)
         bGroup.addAction(self.newJobButton)
         bGroup.addAction(self.editJobButton)
         bGroup.addAction(self.addToJobButton)
         bGroup.addAction(self.callLogButton)
-        vLayout.addWidget(self.toolBar)
-
-        self.setLayout(vLayout)
+        layout.addWidget(self.toolBar)
+        layout.setAlignment(Qt.AlignVCenter)
+        self.setLayout(layout)

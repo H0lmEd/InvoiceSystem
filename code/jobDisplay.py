@@ -12,7 +12,6 @@ class jobDisplayWidget(QWidget):
 
         self.jobNumber = jobNumber
         layout = QFormLayout()
-        iconFolder = os.path.join(os.path.dirname(__file__), os.pardir, 'icons/')
 
         staffLabel = QLabel('Booked in by:')
         self.staffEdit = QLineEdit(self)
@@ -137,8 +136,9 @@ class jobDisplayWidget(QWidget):
 
         self.nextButton = QToolButton(self)
         self.nextButton.setToolButtonStyle(2)
+        self.nextButton.setLayoutDirection(Qt.RightToLeft)
         self.nextButton.setText("Personal Details")
-        self.nextButton.setIcon(QIcon(iconFolder + 'forward.png'))
+        self.nextButton.setIcon(QIcon.fromTheme("go-next-view"))
         self.nextButton.setIconSize(QSize(12, 12))
 
       
@@ -154,7 +154,7 @@ class jobDisplayWidget(QWidget):
         layout.addRow(passwordsLabel, self.passwordWidgets)
         layout.addRow(importantDataLabel, self.importantDataWidgets)
         layout.addRow(dataBackupLabel, self.dataBackupBox)
-        layout.addRow(self.nextButton)
+        layout.addRow("",self.nextButton)
         titleBox.setLayout(layout)
 
         mainLayout = QVBoxLayout(self)
