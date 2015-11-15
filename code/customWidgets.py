@@ -29,7 +29,7 @@ class customTableWidget(QTableWidget):
         QTableWidget.__init__(self)
         entered = pyqtSignal()
     
-    def keyPressEvent(QKeyEvent, event):
+    def keyPressEvent(self, event):
         print(event.key())
         if event.key() == 16777220:
             print("ENTER PRESSED")
@@ -37,6 +37,8 @@ class customTableWidget(QTableWidget):
             super().insertRow(newRow)
             super().setCurrentCell((super().currentRow()+1), 0)
             print('Signal soon to be Emitted')
+            #super.entered = pyqtSignal()
+            self.entered.emit()
             #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
             #jobProgressWidget.cellWatcher
 

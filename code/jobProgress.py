@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTableWidget,
         QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout,
-        QGroupBox)
+        QGroupBox, QMessageBox, QToolButton)
 from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtGui import QIcon
 from customWidgets import customTableWidget
 
 class jobProgressWidget(QWidget):
@@ -26,16 +27,45 @@ class jobProgressWidget(QWidget):
         jobLayout.addWidget(jobNoEdit)
         jobTitleBox.setLayout(jobLayout)
         
-
+        def test():
+            print("Ok")
         partsLabel = QLabel('Parts Used/\nWork Done:')
-        self.partsTable = customTableWidget()
-        self.partsTable.setRowCount(1)
-        self.partsTable.setColumnCount(2)
-        partsHeaders = ["Item","Cost ExVat"]
-        self.partsTable.setHorizontalHeaderLabels(partsHeaders)
-        self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.partsTable.cellChanged.connect(self.updateTotals)
+        #self.partsTable = customTableWidget()
+        #self.partsTable.setRowCount(1)
+        #self.partsTable.setColumnCount(2)
+        #partsHeaders = ["Item","Cost ExVat"]
+        #self.partsTable.setHorizontalHeaderLabels(partsHeaders)
+        #self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #self.partsTable.cellChanged.connect(self.updateTotals)
         #self.partsTable.entered.connect(self.updateTotals)
+        itemLabel = QLabel("Item")
+        priceLabel = QLabel("Price")
+        self.items = 0
+        self.item = {}
+        self.price = {}
+        self.item[0] = QLineEdit(self)
+        self.price[0] = QLineEdit(self)
+        self.addButton = QToolButton(self)
+        self.addButton.setIcon(QIcon.fromTheme("list-add"))
+        self.addButton.clicked.connect(self.addItems)
+        self.priceLayout = QVBoxLayout()
+        self.priceLayout.addWidget(priceLabel)
+        self.priceLayout.addWidget(self.price[0])
+        self.itemLayout = QVBoxLayout()
+        self.itemLayout.addWidget(itemLabel)
+        self.itemLayout.addWidget(self.item[0])
+
+        self.removeButton = {}
+        self.editButton = {}
+        self.buttonLayout = {}
+        self.buttonColumn = QVBoxLayout()
+        self.buttonColumn.addWidget(self.addButton)
+
+        self.tableLayout = QHBoxLayout()
+        self.tableLayout.addLayout(self.itemLayout)
+        self.tableLayout.addLayout(self.priceLayout)
+        self.tableLayout.addLayout(self.buttonColumn)
+
     
         
         self.subTotal = QLabel("$Money")
@@ -61,7 +91,8 @@ class jobProgressWidget(QWidget):
         totalAndTitleLayout.addStretch(1)
         
         tableBox = QVBoxLayout()
-        tableBox.addWidget(self.partsTable)
+        tableBox.addLayout(self.tableLayout)
+        tableBox.addStretch(1)
         tableBox.addLayout(totalAndTitleLayout)
         tableTitleBox = QGroupBox("Parts Used/Work Done")
         tableTitleBox.setLayout(tableBox)
@@ -73,28 +104,78 @@ class jobProgressWidget(QWidget):
         layout.addLayout(leftLayout)
         layout.addWidget(tableTitleBox)
         self.setLayout(layout)
+    def addItems(self):
+        self.items += 1
+        x = self.items
+        itemContent = self.item[0].text()
+        priceContent = self.price[0].text()
+        print("PRice",priceContent)
+        self.item[0].setText("")
+        self.price[0].setText("")
+        self.item[x] = QLineEdit(self)
+        self.item[x].setText(itemContent)
+        self.itemLayout.addWidget(self.item[x])
+        self.price[x] = QLineEdit(self)
+        self.price[x].setText(priceContent)
+        self.priceLayout.addWidget(self.price[x])
+        #self.buttonColumn.removeWidget(self.addButton)
+        
+        self.editButton[x] = QToolButton(self)
+        self.editButton[x].setIcon(QIcon.fromTheme("edit-rename"))
+        self.editButton[x].clicked.connect(self.addItems)
+        self.removeButton[x] = QToolButton(self)
+        self.removeButton[x].setIcon(QIcon.fromTheme("list-remove"))
+        self.removeButton[x].setToolButtonStyle(2)
+        self.removeButton[x].setText(str(x))
+        self.removeButton[x].clicked.connect(lambda: self.removeItems(x)) #Deletes previous line, not current
+        
+        self.buttonLayout[x] = QHBoxLayout()
+        self.buttonLayout[x].addWidget(self.editButton[x])
+        self.buttonLayout[x].addWidget(self.removeButton[x])
+        self.buttonColumn.addLayout(self.buttonLayout[x])
+        #self.buttonColumn.addWidget(self.addButton)
+        self.updateTotals()
+    def removeItems(self, x):
+        print("X:",x)
+        self.itemLayout.removeWidget(self.item[x])
+        self.priceLayout.removeWidget(self.price[x])
+        self.buttonLayout[x].removeWidget(self.editButton[x])
+        self.buttonLayout[x].removeWidget(self.removeButton[x])
+
+        self.buttonColumn.removeItem(self.buttonLayout[x])
+        
+        self.item[x].deleteLater()
+        del self.item[x]
+        self.price[x].deleteLater()
+        del self.price[x]
+        self.editButton[x].deleteLater()
+        del self.editButton[x]
+        self.removeButton[x].deleteLater()
+        del self.removeButton[x]
+        
+        self.items -= 1
+        
+        print("itemLength",len(self.item),"Dict",self.item)
+        
+
+
+
     def updateTotals(self):
         count = 0
         rount = 0
         totalExVat = float(0.00)
         taxTotal = float(0.00)
         total = float(0.00)
-        print (self.partsTable.rowCount())
+        for i in range(0, len(self.item)):
+            if i == 0:
+                pass
+            else:
+                totalExVat = float(totalExVat)+float((self.price[i].text()))
+
+        totalExVat = float(format(totalExVat, '.2f'))
+        taxTotal = float(format((totalExVat*0.2), '0.2f'))
+        total = float(format((totalExVat*1.2), '0.2f'))
         
-        for x in range(self.partsTable.rowCount()):
-            
-            for i in range(self.partsTable.columnCount()): #go through cells 
-                print ('Cell Number:', i, 'Row Number:',x)
-                if i == 1:
-                    try:
-                        totalExVat = float(totalExVat) + float(self.partsTable.item(x,i).text())
-                        totalExVat = float(format(totalExVat, '.2f'))
-                        taxTotal = float(format((totalExVat*0.2), '0.2f'))
-                        total = float(format((totalExVat*1.2), '0.2f'))
-                    except AttributeError:
-                        print("Attrubute ERror")
-                    except ValueError:
-                        print("Value Error")
         pound = u'\u00A3'
         self.subTotal.setText(pound+str(totalExVat))
         self.taxAmount.setText(pound+str(taxTotal))

@@ -29,7 +29,7 @@ class mainInterface(QWidget):
         self.buttons.editJobButton.triggered.connect(lambda: self.getJobNumber(1))
         self.buttons.addToJobButton.triggered.connect(lambda: self.getJobNumber(2))
         self.buttons.callLogButton.triggered.connect(lambda: self.getJobNumber(3))
-        
+        self.buttons.homeButton.triggered.connect(self.startScreen)        
         vertLine = QFrame()
         vertLine.setFrameShape(QFrame.VLine)
         vertLine.setFrameShadow(QFrame.Sunken)
@@ -86,7 +86,7 @@ class mainInterface(QWidget):
                 custBackup = "Yes"
             else:
                 custBackup = "No"
-            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
+            fileSaveTo = open("."+str(jobForm.jobNumber), "a")
             fileSaveTo.write("JOBDETAILS")
             fileSaveTo.write("\n"+staff)
             fileSaveTo.write("\n"+custItems)
@@ -232,8 +232,55 @@ class mainInterface(QWidget):
                 elif nextFunction == 3:
                     self.jobCalls(int(searchWidget.searchField.text()))
         searchWidget.searchBtn.clicked.connect(errorChecking)
-    def editPersonalDeets(self):
+    def editPersonalDeets(self, jobForm):
+        jobForm = jobForm
         def writeToFile():
+
+            staff = jobForm.staffEdit.text()
+            custItems = jobForm.itemEdit.text()
+            if jobForm.psuButtonGroup.checkedId() == -2:
+                custPsu = "Yes"
+            elif jobForm.psuButtonGroup.checkedId() == -3:
+                custPsu = "No"
+            else:
+                custPsu = "N/A"
+            itemCondition = jobForm.condition.text()
+            custProblem = jobForm.problemEdit.toPlainText()
+            custPasswordField = ""
+            print("Passwords",jobForm.passButtonGrp.checkedId())
+            if jobForm.passButtonGrp.checkedId() == -2:
+                print("Password Detected")
+                custPasswords =  "Yes"
+                custPasswordField = jobForm.passwords.toPlainText()
+            else:
+                print("No Password")
+                custPasswords = "No"
+                custPasswordField = ""
+            if jobForm.importantDataGrp.checkedId() == -2:
+                custData = "Yes"
+                custDataField = jobForm.importantData.text()
+            else:
+                custData = "No"
+                custDataField = ""
+            if jobForm.dataBackupGrp.checkedId() == -1:
+                custBackup = "Yes"
+            else:
+                custBackup = "No"
+            fileSaveTo = open("."+str(jobForm.jobNumber), "a")
+            fileSaveTo.write("JOBDETAILS")
+            fileSaveTo.write("\n"+staff)
+            fileSaveTo.write("\n"+custItems)
+            fileSaveTo.write("\n"+custPsu)
+            fileSaveTo.write("\n"+itemCondition)
+            fileSaveTo.write("\n"+custProblem)
+            fileSaveTo.write("\n"+custPasswords)
+            fileSaveTo.write("\n"+custPasswordField)
+            fileSaveTo.write("\n"+custData)
+            fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
+            fileSaveTo.write("\n"+custBackup)
+            self.statusBar.showMessage("job Details saved")
+            statusText = "No Eeorrs"
+            
             custName = detailsForm.nameEdit.text()
             if self.emailPresent:
                 custEmail = detailsForm.emailAddr.text()
@@ -244,11 +291,11 @@ class mainInterface(QWidget):
             else:
                 custPhoneNo = ""
             custMobileNo = detailsForm.mobileNo.text()
-            custPC = detailsForm.pcLineEdit.text()
+            custPC = detailsForm.pcEdit.text()
             custAddrOne = detailsForm.addrLineOne.text()
             custAddrTwo = detailsForm.addrLineTwo.text()
             
-            fileSaveTo = open("."+str(jobNum), "a")
+            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
             fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
             fileSaveTo.write('\n'+custEmail)
             fileSaveTo.write('\n'+custPhoneNo)
@@ -293,7 +340,7 @@ class mainInterface(QWidget):
             else:
                 detailsForm.mobileVal.tick()
         def pcEditCheck():
-            if detailsForm.pcLineEdit.text() == "":
+            if detailsForm.pcEdit.text() == "": #Different for layout 
                 self.errorsDetected = True                
                 detailsForm.pcVal.error()
             else:
@@ -327,7 +374,7 @@ class mainInterface(QWidget):
                     writeToFile()
          
         detailsForm = custDetailForm(False)
-        print(self.readFile)
+        print("Editing Personal Details:", self.readFile)
         detailsForm.nameEdit.setText(self.readFile[12])
         if self.readFile[13] != "":
             detailsForm.emailAddr.setText(self.readFile[13])
@@ -479,10 +526,10 @@ class mainInterface(QWidget):
                     self.statusBar.showMessage("Fix Errors")
                     break
                 elif self.errorsDetected == False and x == 10:
-                    print("Writing to File")
-                    writeToFile()
+                    #print("Writing to File")
+                    #writeToFile()
                     print("Job No:", jobForm.jobNoEdit.text())
-                    self.personalDeets(jobForm.jobNumber)
+                    self.editPersonalDeets(jobForm)
         jobForm = jobDisplayWidget(int(jobNo))
         origFile = open('.'+str(jobNo))
         self.readFile = []
@@ -537,18 +584,6 @@ class mainInterface(QWidget):
         jobProgress = jobProgressWidget(jobNo)
         self.centralWidget.addWidget(jobProgress)
         self.centralWidget.setCurrentWidget(jobProgress)
-    
-    def goHome(self):
-        titleWidget = self.centralWidget.currentWidget()
-        if "findJob" in str(titleWidget):
-            self.titleLayout.removeWidget(self.jobSearchTitle)
-            self.jobSearchTitle.deleteLater()
-            self.jobSearchTitle = None
-        elif "newJob" in str(titleWidget):
-            self.titleLayout.removeWidget(self.progressWidget)
-            sip.delete(self.progressWidget) #Steals C++ delete function
-            self.progressWidget = None
-        self.centralWidget.setCurrentWidget(self.buttons)
     
     def personalDeets(self, jobNum):
         print("Job 1No:",jobNum)
