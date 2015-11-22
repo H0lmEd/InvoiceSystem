@@ -135,8 +135,10 @@ class jobDisplayWidget(QWidget):
         
 
         self.nextButton = QToolButton(self)
-        self.nextButton.setToolButtonStyle(2)
-        self.nextButton.setLayoutDirection(Qt.RightToLeft)
+        self.nextButton.setToolButtonStyle(6)
+        nextButtonLayout = QHBoxLayout()
+        nextButtonLayout.addStretch(1)
+        nextButtonLayout.addWidget(self.nextButton)
         self.nextButton.setText("Personal Details")
         self.nextButton.setIcon(QIcon.fromTheme("go-next-view"))
         self.nextButton.setIconSize(QSize(12, 12))
@@ -154,7 +156,7 @@ class jobDisplayWidget(QWidget):
         layout.addRow(passwordsLabel, self.passwordWidgets)
         layout.addRow(importantDataLabel, self.importantDataWidgets)
         layout.addRow(dataBackupLabel, self.dataBackupBox)
-        layout.addRow("",self.nextButton)
+        layout.addRow("",nextButtonLayout)
         titleBox.setLayout(layout)
 
         mainLayout = QVBoxLayout(self)
@@ -166,3 +168,9 @@ class jobDisplayWidget(QWidget):
             self.importantData.setReadOnly(False)
         elif self.importantDataGrp.checkedId() == -3:
             self.importantData.setReadOnly(True)
+
+    def passwordsChecked(self):
+        if self.passButtonGrp.checkedId() == -2:
+            self.passwords.setReadOnly(False)
+        elif self.passButtonGrp.checkedId() == -3:
+            self.passwords.setReadOnly(Trie)

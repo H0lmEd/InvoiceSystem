@@ -3,7 +3,9 @@
 import sys
 import os
 import sip
-
+import pickle
+# PICKLE SHIT UP YO
+# - 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -56,50 +58,43 @@ class mainInterface(QWidget):
     def newJob(self):
         print("NEW JOB")
         def writeToFile():
-            staff = jobForm.staffEdit.text()
-            custItems = jobForm.itemEdit.text()
+            itemData = {}
+            itemData['staff'] = jobForm.staffEdit.text()
+            itemData['items'] = jobForm.itemEdit.text()
             if jobForm.psuButtonGroup.checkedId() == -2:
                 custPsu = "Yes"
+                itemData['psu'] = "Yes"
             elif jobForm.psuButtonGroup.checkedId() == -3:
                 custPsu = "No"
+                itemData['psu'] = "No"
             else:
                 custPsu = "N/A"
-            itemCondition = jobForm.condition.text()
-            custProblem = jobForm.problemEdit.toPlainText()
-            custPasswordField = ""
+                itemData['psu'] = "N/A"
+            itemData['condition'] = jobForm.condition.text()
+            itemData['problem'] = jobForm.problemEdit.toPlainText()
             print("Passwords",jobForm.passButtonGrp.checkedId())
             if jobForm.passButtonGrp.checkedId() == -2:
                 print("Password Detected")
                 custPasswords =  "Yes"
-                custPasswordField = jobForm.passwords.toPlainText()
+                itemData['password'] = jobForm.passwords.toPlainText()
             else:
                 print("No Password")
                 custPasswords = "No"
-                custPasswordField = ""
+                itemData['password'] = ""
+
             if jobForm.importantDataGrp.checkedId() == -2:
                 custData = "Yes"
-                custDataField = jobForm.importantData.text()
+                itemData['data'] = jobForm.importantData.text()
             else:
                 custData = "No"
-                custDataField = ""
+                itemData['data'] = ""
+                
             if jobForm.dataBackupGrp.checkedId() == -1:
-                custBackup = "Yes"
+                itemData['backup'] = "Yes"
             else:
-                custBackup = "No"
-            fileSaveTo = open("."+str(jobForm.jobNumber), "a")
-            fileSaveTo.write("JOBDETAILS")
-            fileSaveTo.write("\n"+staff)
-            fileSaveTo.write("\n"+custItems)
-            fileSaveTo.write("\n"+custPsu)
-            fileSaveTo.write("\n"+itemCondition)
-            fileSaveTo.write("\n"+custProblem)
-            fileSaveTo.write("\n"+custPasswords)
-            fileSaveTo.write("\n"+custPasswordField)
-            fileSaveTo.write("\n"+custData)
-            fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
-            fileSaveTo.write("\n"+custBackup)
-            self.statusBar.showMessage("job Details saved")
-            statusText = "No Eeorrs"
+                itemData['backup'] = "No"
+            pickle.dump(itemData, open("Jobs/Incomplete/."+str(jobForm.jobNumber), "wb"))
+
         
         def staffEditCheck():
             print("Staff",jobForm.staffEdit.text())
@@ -214,7 +209,6 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(jobForm)
    
     def getJobNumber(self, nextFunction):
-        
         print("nxt Fun", nextFunction)
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
@@ -232,80 +226,26 @@ class mainInterface(QWidget):
                 elif nextFunction == 3:
                     self.jobCalls(int(searchWidget.searchField.text()))
         searchWidget.searchBtn.clicked.connect(errorChecking)
-    def editPersonalDeets(self, jobForm):
-        jobForm = jobForm
+    def editPersonalDeets(self, jobNum):
         def writeToFile():
-
-            staff = jobForm.staffEdit.text()
-            custItems = jobForm.itemEdit.text()
-            if jobForm.psuButtonGroup.checkedId() == -2:
-                custPsu = "Yes"
-            elif jobForm.psuButtonGroup.checkedId() == -3:
-                custPsu = "No"
-            else:
-                custPsu = "N/A"
-            itemCondition = jobForm.condition.text()
-            custProblem = jobForm.problemEdit.toPlainText()
-            custPasswordField = ""
-            print("Passwords",jobForm.passButtonGrp.checkedId())
-            if jobForm.passButtonGrp.checkedId() == -2:
-                print("Password Detected")
-                custPasswords =  "Yes"
-                custPasswordField = jobForm.passwords.toPlainText()
-            else:
-                print("No Password")
-                custPasswords = "No"
-                custPasswordField = ""
-            if jobForm.importantDataGrp.checkedId() == -2:
-                custData = "Yes"
-                custDataField = jobForm.importantData.text()
-            else:
-                custData = "No"
-                custDataField = ""
-            if jobForm.dataBackupGrp.checkedId() == -1:
-                custBackup = "Yes"
-            else:
-                custBackup = "No"
-            fileSaveTo = open("."+str(jobForm.jobNumber), "a")
-            fileSaveTo.write("JOBDETAILS")
-            fileSaveTo.write("\n"+staff)
-            fileSaveTo.write("\n"+custItems)
-            fileSaveTo.write("\n"+custPsu)
-            fileSaveTo.write("\n"+itemCondition)
-            fileSaveTo.write("\n"+custProblem)
-            fileSaveTo.write("\n"+custPasswords)
-            fileSaveTo.write("\n"+custPasswordField)
-            fileSaveTo.write("\n"+custData)
-            fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
-            fileSaveTo.write("\n"+custBackup)
-            self.statusBar.showMessage("job Details saved")
-            statusText = "No Eeorrs"
-            
-            custName = detailsForm.nameEdit.text()
+            custData = {}
+            custData['name'] = detailsForm.nameEdit.text()
             if self.emailPresent:
-                custEmail = detailsForm.emailAddr.text()
+                custData['email'] = detailsForm.emailAddr.text()
             else:
-                custEmail = ""
+                custData['email'] = ""
             if self.phonePresent:
-                custPhoneNo = detailsForm.phoneNo.text()
+                custData['phone'] = detailsForm.phoneNo.text()
             else:
-                custPhoneNo = ""
-            custMobileNo = detailsForm.mobileNo.text()
-            custPC = detailsForm.pcEdit.text()
-            custAddrOne = detailsForm.addrLineOne.text()
-            custAddrTwo = detailsForm.addrLineTwo.text()
+                custData['phone'] = ""
+            custData['mobile'] = detailsForm.mobileNo.text()
+            custData['postcode'] = detailsForm.pcEdit.text()
+            custData['addrone'] = detailsForm.addrLineOne.text()
+            custData['addrtwo'] = detailsForm.addrLineTwo.text()
             
-            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
-            fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
-            fileSaveTo.write('\n'+custEmail)
-            fileSaveTo.write('\n'+custPhoneNo)
-            fileSaveTo.write('\n'+custMobileNo)
-            fileSaveTo.write('\n'+custPC)
-            fileSaveTo.write('\n'+custAddrOne)
-            fileSaveTo.write('\n'+custAddrTwo)
-            fileSaveTo.close()
             self.statusBar.showMessage("Job Details Saved")
-                
+            pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
+
         def nameEditCheck():
             if detailsForm.nameEdit.text() == "":
                 detailsForm.nameVal.error()
@@ -374,67 +314,62 @@ class mainInterface(QWidget):
                     writeToFile()
          
         detailsForm = custDetailForm(False)
-        print("Editing Personal Details:", self.readFile)
-        detailsForm.nameEdit.setText(self.readFile[12])
-        if self.readFile[13] != "":
-            detailsForm.emailAddr.setText(self.readFile[13])
-        if self.readFile[14] != "":
-            detailsForm.phoneNo.setText(self.readFile[14])
-        detailsForm.mobileNo.setText(self.readFile[15])
-        detailsForm.pcEdit.setText(self.readFile[16])
-        detailsForm.addrLineOne.setText(self.readFile[17])
-        detailsForm.addrLineTwo.setText(self.readFile[18])
+        custData = pickle.load(open('Customers/.'+str(jobNum), 'rb'))
+        detailsForm.nameEdit.setText(custData['name'])
+        if custData['email'] != "":
+            detailsForm.emailAddr.setText(custData['email'])
+        if custData['phone'] != "":
+            detailsForm.phoneNo.setText(custData['phone'])
+        detailsForm.mobileNo.setText(custData['mobile'])
+        detailsForm.pcEdit.setText(custData['postcode'])
+        detailsForm.addrLineOne.setText(custData['addrone'])
+        detailsForm.addrLineTwo.setText(custData['addrtwo'])
         detailsForm.nextButton.clicked.connect(errorChecking)
+        detailsForm.addrLineOne.setReadOnly(False)
+        detailsForm.addrLineTwo.setReadOnly(False)
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
          
     def editJobDetails(self, jobNo):
         def writeToFile():
-            staff = jobForm.staffEdit.text()
-            custItems = jobForm.itemEdit.text()
+            itemData = {}
+            itemData['staff'] = jobForm.staffEdit.text()
+            itemData['items'] = jobForm.itemEdit.text()
             if jobForm.psuButtonGroup.checkedId() == -2:
                 custPsu = "Yes"
+                itemData['psu'] = "Yes"
             elif jobForm.psuButtonGroup.checkedId() == -3:
                 custPsu = "No"
+                itemData['psu'] = "No"
             else:
                 custPsu = "N/A"
-            itemCondition = jobForm.condition.text()
-            custProblem = jobForm.problemEdit.toPlainText()
-            custPasswordField = ""
+                itemData['psu'] = "N/A"
+            itemData['condition'] = jobForm.condition.text()
+            itemData['problem'] = jobForm.problemEdit.toPlainText()
             print("Passwords",jobForm.passButtonGrp.checkedId())
             if jobForm.passButtonGrp.checkedId() == -2:
                 print("Password Detected")
                 custPasswords =  "Yes"
-                custPasswordField = jobForm.passwords.toPlainText()
+                itemData['password'] = jobForm.passwords.toPlainText()
             else:
                 print("No Password")
                 custPasswords = "No"
-                custPasswordField = ""
+                itemData['password'] = ""
+
             if jobForm.importantDataGrp.checkedId() == -2:
                 custData = "Yes"
-                custDataField = jobForm.importantData.text()
+                itemData['data'] = jobForm.importantData.text()
             else:
                 custData = "No"
-                custDataField = ""
+                itemData['data'] = ""
+                
             if jobForm.dataBackupGrp.checkedId() == -1:
-                custBackup = "Yes"
+                itemData['backup'] = "Yes"
             else:
-                custBackup = "No"
-            fileSaveTo = open("."+str(jobForm.jobNumber), "w")
-            fileSaveTo.write("JOBDETAILS")
-            fileSaveTo.write("\n"+staff)
-            fileSaveTo.write("\n"+custItems)
-            fileSaveTo.write("\n"+custPsu)
-            fileSaveTo.write("\n"+itemCondition)
-            fileSaveTo.write("\n"+custProblem)
-            fileSaveTo.write("\n"+custPasswords)
-            fileSaveTo.write("\n"+custPasswordField)
-            fileSaveTo.write("\n"+custData)
-            fileSaveTo.write("\n"+custDataField) #if data in there, write, if not line is empty
-            fileSaveTo.write("\n"+custBackup)
-            self.statusBar.showMessage("job Details saved")
-            statusText = "No Eeorrs"
-
+                itemData['backup'] = "No"
+            print("New Items", itemData)
+            pickle.dump(itemData, open("Jobs/Incomplete/."+str(jobNo), "wb"))
+            
         def staffEditCheck():
             print("Staff",jobForm.staffEdit.text())
             if jobForm.staffEdit.text() == "":
@@ -527,49 +462,44 @@ class mainInterface(QWidget):
                     break
                 elif self.errorsDetected == False and x == 10:
                     #print("Writing to File")
-                    #writeToFile()
+                    writeToFile()
                     print("Job No:", jobForm.jobNoEdit.text())
-                    self.editPersonalDeets(jobForm)
+                    self.editPersonalDeets(jobNo)
         jobForm = jobDisplayWidget(int(jobNo))
-        origFile = open('.'+str(jobNo))
-        self.readFile = []
-        for line in origFile.readlines():
-            line = line.replace("\n","")
-            self.readFile.append(line)
-        print ("New File", self.readFile)
-        staff = self.readFile[1]
-        custItems = self.readFile[2]
-        if 'N/A' in self.readFile[3]:
+        itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), "rb"))
+
+        #for line in itemData:
+        #    itemData[line] = line.replace("\n","")
+        if 'N/A' in itemData['psu']:
             jobForm.psuNA.setChecked(1)
-        elif 'No' in self.readFile[3]:
+        elif 'No' in itemData['psu']:
             jobForm.psuN.setChecked(1)
         else:
             jobForm.psuY.setChecked(1)
-        itemCondition = self.readFile[4]
-        custProblem = self.readFile[5]
-        if "No" in self.readFile[6]:
+
+        if itemData['password'] == "":
             jobForm.passwordCheckNo.setChecked(1)
-        elif "Yes" in self.readFile[6]:
+        else:
             jobForm.passwordCheckYes.setChecked(1)
-            jobForm.passwords.setText(self.readFile[7])
-        print(origFile.read())
-        if 'No' in self.readFile[8]:
+            jobForm.passwords.setText(itemData['password'])
+        if itemData['data'] == "":
             jobForm.importantDataCheckNo.setChecked(1)
         else:
             jobForm.importantDataCheckYes.setChecked(1)
             jobForm.importantData.setReadOnly(False)
-            jobForm.importantData.setText(self.readFile[9])
-        if 'No' in self.readFile[10]:
+            jobForm.importantData.setText(itemData['data'])
+        if 'No' in itemData['backup']:
             jobForm.dataBackupCheckNo.setChecked(1)
         else:
             jobForm.dataBackupCheckYes.setChecked(1)
-        jobForm.itemEdit.setText(custItems)
-        jobForm.staffEdit.setText(staff)
+        jobForm.itemEdit.setText(itemData['items'])
+        jobForm.staffEdit.setText(itemData['staff'])
         jobForm.itemEdit.setCursorPosition(0)
-        #jobForm.psuButtonGroup.setcheckedId(custPsu)
-        jobForm.condition.setText(itemCondition)
-        jobForm.problemEdit.setText(custProblem)
+        jobForm.condition.setText(itemData['condition'])
+        jobForm.problemEdit.setText(itemData['problem'])
         
+        jobForm.importantDataChecked()
+
         self.centralWidget.addWidget(jobForm)
         print("Editing Job",int(jobNo))
         self.centralWidget.setCurrentWidget(jobForm)
@@ -581,38 +511,63 @@ class mainInterface(QWidget):
                  
     
     def addToJob(self, jobNo):
+        def writeToFile():
+            #fileReadFrom = open("."+str(jobNo), "r")
+            #oldFile = fileReadFrom.readlines()
+            itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), 'rb'))
+            try:
+                for i in jobProgress.removals:
+                    del itemData['item'+str(i-1)] #arrayu is 1 infront of items
+                    del itemData['price'+str(i-1)]
+            except AttributeError or KeyError: #Attr (no removal) key (add then del before save)
+                pass
+            x = 0
+            for i in range(1,len(jobProgress.item)):
+                itemIndex = 'item'+str(x)
+                priceIndex = 'price'+str(x)
+                itemData[itemIndex] = jobProgress.item[i].text()
+                itemData[priceIndex] = jobProgress.price[i].text()
+                x += 1 
+
+            itemData['jobnotes'] = jobProgress.jobNotesEdit.toPlainText()
+            pickle.dump(itemData, open('Jobs/Incomplete/.'+str(jobNo), "wb"))
         jobProgress = jobProgressWidget(jobNo)
+        #fileContents = fileReadFrom.readlines()
+        itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), 'rb'))
+        itemCount = 0
+        for i in itemData:
+            print(i)
+            if 'price' in i: #iteratge price, item is taken
+                i=i[5:] #remove price
+                jobProgress.addItems(itemData['item'+str(i)], itemData['price'+str(i)])
+        try:
+            jobProgress.jobNotesEdit.setText(itemData['jobnotes'])
+        except KeyError:
+            pass
+        jobProgress.saveButton.clicked.connect(writeToFile)
         self.centralWidget.addWidget(jobProgress)
         self.centralWidget.setCurrentWidget(jobProgress)
     
     def personalDeets(self, jobNum):
         print("Job 1No:",jobNum)
         def writeToFile():
-            custName = detailsForm.nameEdit.text()
+            custData = {}
+            custData['name'] = detailsForm.nameEdit.text()
             if self.emailPresent:
-                custEmail = detailsForm.emailAddr.text()
+                custData['email'] = detailsForm.emailAddr.text()
             else:
-                custEmail = ""
+                custData['email'] = ""
             if self.phonePresent:
-                custPhoneNo = detailsForm.phoneNo.text()
+                custData['phone'] = detailsForm.phoneNo.text()
             else:
-                custPhoneNo = ""
-            custMobileNo = detailsForm.mobileNo.text()
-            custPC = detailsForm.pcLineEdit.text()
-            custAddrOne = detailsForm.addrLineOne.text()
-            custAddrTwo = detailsForm.addrLineTwo.text()
+                custData['phone'] = ""
+            custData['mobile'] = detailsForm.mobileNo.text()
+            custData['postcode'] = detailsForm.pcLineEdit.text()
+            custData['addrone'] = detailsForm.addrLineOne.text()
+            custData['addrtwo'] = detailsForm.addrLineTwo.text()
             
-            fileSaveTo = open("."+str(jobNum), "a")
-            fileSaveTo.write("\nPERSONALDETAILS\n"+custName)
-            fileSaveTo.write('\n'+custEmail)
-            fileSaveTo.write('\n'+custPhoneNo)
-            fileSaveTo.write('\n'+custMobileNo)
-            fileSaveTo.write('\n'+custPC)
-            fileSaveTo.write('\n'+custAddrOne)
-            fileSaveTo.write('\n'+custAddrTwo)
-            fileSaveTo.close()
             self.statusBar.showMessage("Job Details Saved")
-                
+            pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
         def nameEditCheck():
             if detailsForm.nameEdit.text() == "":
                 detailsForm.nameVal.error()
@@ -679,12 +634,13 @@ class mainInterface(QWidget):
                 elif self.errorsDetected == False and x == 7:
                     print("WRote")
                     writeToFile()
-                    self.goHome()
+                    #self.goHome()
         detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
-
+    
+    
     def jobCalls(self, jobNo):
         callLog = callLogWidget(jobNo)
         self.centralWidget.addWidget(callLog)

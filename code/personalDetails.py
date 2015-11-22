@@ -39,7 +39,7 @@ class custDetailForm(QWidget):
                     print(str(numberDialog[0]))
                     return str(numberDialog[0])
             try:
-                apiKey = '?api-key=k-0nPmNhZ06jmM4g29K8yw1962'
+                apiKey = '?api-key=NyymxEPG60eBjmqmqjImRQ2293'
                 url = 'https://api.getaddress.io/v2/uk/' + self.pcLineEdit.text() +'/' + getHomeNo()+ apiKey
                 req = urllib.request.Request(url)
                 res = urllib.request.urlopen(req)
@@ -89,8 +89,7 @@ class custDetailForm(QWidget):
             self.pcEdit = QLineEdit(self)
             
         #WIDGETS
-        instr = QLabel("""Enter the customer's details. Fields marked with
-                        a (*) are required""")
+        instr = QLabel("""Enter the customer's details. Fields marked witha (*) are required""")
         nameLabel = QLabel('* Full Name:')
         self.nameEdit = QLineEdit(self)
         self.nameVal = validationImage(self)

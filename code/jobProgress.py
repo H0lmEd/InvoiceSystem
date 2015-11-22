@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTa
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QIcon
 from customWidgets import customTableWidget
-
+import pickle
 class jobProgressWidget(QWidget):
     def __init__(self, jobNumber, parent=None):
         super(jobProgressWidget, self).__init__(parent)
@@ -47,7 +47,7 @@ class jobProgressWidget(QWidget):
         self.price[0] = QLineEdit(self)
         self.addButton = QToolButton(self)
         self.addButton.setIcon(QIcon.fromTheme("list-add"))
-        self.addButton.clicked.connect(self.addItems)
+        self.addButton.clicked.connect(lambda: self.addItems(self.item[0].text(), self.price[0].text()))
         self.priceLayout = QVBoxLayout()
         self.priceLayout.addWidget(priceLabel)
         self.priceLayout.addWidget(self.price[0])
@@ -56,7 +56,6 @@ class jobProgressWidget(QWidget):
         self.itemLayout.addWidget(self.item[0])
 
         self.removeButton = {}
-        self.editButton = {}
         self.buttonLayout = {}
         self.buttonColumn = QVBoxLayout()
         self.buttonColumn.addWidget(self.addButton)
@@ -66,7 +65,7 @@ class jobProgressWidget(QWidget):
         self.tableLayout.addLayout(self.priceLayout)
         self.tableLayout.addLayout(self.buttonColumn)
 
-    
+        self.saveButton = QPushButton("Save") 
         
         self.subTotal = QLabel("$Money")
         self.taxAmount = QLabel("$Less Mpney")
@@ -89,6 +88,7 @@ class jobProgressWidget(QWidget):
         totalAndTitleLayout.addLayout(totalTitleLayout)
         totalAndTitleLayout.addLayout(totalLayout)
         totalAndTitleLayout.addStretch(1)
+        totalAndTitleLayout.addWidget(self.saveButton)
         
         tableBox = QVBoxLayout()
         tableBox.addLayout(self.tableLayout)
@@ -104,12 +104,11 @@ class jobProgressWidget(QWidget):
         layout.addLayout(leftLayout)
         layout.addWidget(tableTitleBox)
         self.setLayout(layout)
-    def addItems(self):
+    def addItems(self, itemContent, priceContent):
         self.items += 1
         x = self.items
-        itemContent = self.item[0].text()
-        priceContent = self.price[0].text()
-        print("PRice",priceContent)
+        #itemContent = self.item[0].text()
+        #priceContent = self.price[0].text()
         self.item[0].setText("")
         self.price[0].setText("")
         self.item[x] = QLineEdit(self)
@@ -120,9 +119,6 @@ class jobProgressWidget(QWidget):
         self.priceLayout.addWidget(self.price[x])
         #self.buttonColumn.removeWidget(self.addButton)
         
-        self.editButton[x] = QToolButton(self)
-        self.editButton[x].setIcon(QIcon.fromTheme("edit-rename"))
-        self.editButton[x].clicked.connect(self.addItems)
         self.removeButton[x] = QToolButton(self)
         self.removeButton[x].setIcon(QIcon.fromTheme("list-remove"))
         self.removeButton[x].setToolButtonStyle(2)
@@ -130,16 +126,16 @@ class jobProgressWidget(QWidget):
         self.removeButton[x].clicked.connect(lambda: self.removeItems(x)) #Deletes previous line, not current
         
         self.buttonLayout[x] = QHBoxLayout()
-        self.buttonLayout[x].addWidget(self.editButton[x])
         self.buttonLayout[x].addWidget(self.removeButton[x])
         self.buttonColumn.addLayout(self.buttonLayout[x])
         #self.buttonColumn.addWidget(self.addButton)
         self.updateTotals()
     def removeItems(self, x):
+        self.removals = []
+        self.removals.append(x)
         print("X:",x)
         self.itemLayout.removeWidget(self.item[x])
         self.priceLayout.removeWidget(self.price[x])
-        self.buttonLayout[x].removeWidget(self.editButton[x])
         self.buttonLayout[x].removeWidget(self.removeButton[x])
 
         self.buttonColumn.removeItem(self.buttonLayout[x])
@@ -148,11 +144,9 @@ class jobProgressWidget(QWidget):
         del self.item[x]
         self.price[x].deleteLater()
         del self.price[x]
-        self.editButton[x].deleteLater()
-        del self.editButton[x]
         self.removeButton[x].deleteLater()
         del self.removeButton[x]
-        
+        print("Job Number", self.jobNumber)
         self.items -= 1
         
         print("itemLength",len(self.item),"Dict",self.item)
