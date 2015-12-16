@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTableWidget,
         QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout,
-        QGroupBox, QMessageBox, QToolButton)
+        QGroupBox, QMessageBox, QToolButton, QCheckBox)
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QIcon
 from customWidgets import customTableWidget
@@ -27,6 +27,7 @@ class jobProgressWidget(QWidget):
         jobLayout.addWidget(jobNoEdit)
         jobTitleBox.setLayout(jobLayout)
         
+        self.pound = u'\u00A3'
         def test():
             print("Ok")
         partsLabel = QLabel('Parts Used/\nWork Done:')
@@ -65,11 +66,15 @@ class jobProgressWidget(QWidget):
         self.tableLayout.addLayout(self.priceLayout)
         self.tableLayout.addLayout(self.buttonColumn)
 
+        self.completeBox = QCheckBox("Job Complete")
         self.saveButton = QPushButton("Save") 
+        buttonLayout = QVBoxLayout()
+        buttonLayout.addWidget(self.completeBox)
+        buttonLayout.addWidget(self.saveButton)
         
-        self.subTotal = QLabel("$Money")
-        self.taxAmount = QLabel("$Less Mpney")
-        self.totalAmount = QLabel("$More Money")
+        self.subTotal = QLabel(self.pound+"0.00")
+        self.taxAmount = QLabel(self.pound+"0.00")
+        self.totalAmount = QLabel(self.pound+"0.00")
         
         subTotalTitle = QLabel("Sub Total:")
         taxTotalTitle = QLabel("Tax:")
@@ -88,7 +93,7 @@ class jobProgressWidget(QWidget):
         totalAndTitleLayout.addLayout(totalTitleLayout)
         totalAndTitleLayout.addLayout(totalLayout)
         totalAndTitleLayout.addStretch(1)
-        totalAndTitleLayout.addWidget(self.saveButton)
+        totalAndTitleLayout.addLayout(buttonLayout)
         
         tableBox = QVBoxLayout()
         tableBox.addLayout(self.tableLayout)
@@ -170,7 +175,6 @@ class jobProgressWidget(QWidget):
         taxTotal = float(format((totalExVat*0.2), '0.2f'))
         total = float(format((totalExVat*1.2), '0.2f'))
         
-        pound = u'\u00A3'
-        self.subTotal.setText(pound+str(totalExVat))
-        self.taxAmount.setText(pound+str(taxTotal))
-        self.totalAmount.setText(pound+str(total))
+        self.subTotal.setText(self.pound+str(totalExVat))
+        self.taxAmount.setText(self.pound+str(taxTotal))
+        self.totalAmount.setText(self.pound+str(total))

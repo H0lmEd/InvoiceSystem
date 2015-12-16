@@ -34,9 +34,7 @@ class custDetailForm(QWidget):
                 numberData.setComboBoxEditable(True)
                 numberDialog = numberData.getText(self, "Home Number",
                         "Home Number:")
-                print(numberData, numberDialog)
                 if numberDialog:
-                    print(str(numberDialog[0]))
                     return str(numberDialog[0])
             try:
                 apiKey = '?api-key=NyymxEPG60eBjmqmqjImRQ2293'
@@ -53,8 +51,6 @@ class custDetailForm(QWidget):
                 secondLine = splitTownLine[1:len(splitTownLine)]
 
                 userAddress = (firstLine,'\n'+secondLine)
-                print(commaSep)
-                print(userAddress)
                 
                 confirm = QMessageBox.question(self, 'Confirm',
                         ("Does this look correct?\n%s\n%s"%(firstLine,secondLine)),
@@ -64,10 +60,7 @@ class custDetailForm(QWidget):
                     self.addrLineTwo.setText(secondLine)
                 else:
                     self.notTheAddress()
-            except urllib.error.HTTPError as d:
-                print (d)
-                print ("error")
-                
+            except urllib.error.HTTPError:
                 reply = QMessageBox.critical(self, "Error", 
                         "Check your info and try again", QMessageBox.Ok)
             except urllib.error.URLError:
@@ -89,7 +82,7 @@ class custDetailForm(QWidget):
             self.pcEdit = QLineEdit(self)
             
         #WIDGETS
-        instr = QLabel("""Enter the customer's details. Fields marked witha (*) are required""")
+        instr = QLabel("""Enter the customer's details. Fields marked with a (*) are required""")
         nameLabel = QLabel('* Full Name:')
         self.nameEdit = QLineEdit(self)
         self.nameVal = validationImage(self)
@@ -120,8 +113,6 @@ class custDetailForm(QWidget):
         mobileBox.addWidget(self.mobileVal)
         
         pcLabel = QLabel('* Post Code:')
-        
-
         addrLabel = QLabel('* Home Address:')
         self.addrLineOne = QLineEdit(self)
         self.addrLineOne.setReadOnly(True)
@@ -141,11 +132,15 @@ class custDetailForm(QWidget):
         addrBox = QVBoxLayout()
         addrBox.addLayout(addrLineOneBox)
         addrBox.addLayout(addrLineTwoBox)
-        #self.addrEdit.setPlaceholderText("123 New Street\nArea\nTown")
 
-        self.nextButton = QPushButton("Next")
-        
+        self.nextButton = QToolButton()
+        self.nextButton.setText("Save")
+        self.nextButton.setIcon(QIcon.fromTheme("document-save"))
+        self.nextButton.setToolButtonStyle(4)
 
+        nextBox = QHBoxLayout()
+        nextBox.addStretch(1)
+        nextBox.addWidget(self.nextButton)
 
 
         titleBox = QGroupBox("Customer Details")
@@ -158,7 +153,7 @@ class custDetailForm(QWidget):
         layout.addRow(mobileLabel, mobileBox)
         layout.addRow(pcLabel, self.pcEdit)
         layout.addRow(addrLabel, addrBox)
-        layout.addRow(self.nextButton)
+        layout.addRow("", nextBox)
         titleBox.setLayout(layout)
 
         mainLayout = QVBoxLayout(self)

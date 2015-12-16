@@ -15,7 +15,7 @@ from startScreen import startScreenForm
 from jobDisplay import jobDisplayWidget
 from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
-from callLog import callLogWidget
+from jobs import jobsWidget
 #from PyKde4.kdeui import KIcon
 
 
@@ -30,7 +30,7 @@ class mainInterface(QWidget):
         self.buttons.newJobButton.triggered.connect(self.newJob)
         self.buttons.editJobButton.triggered.connect(lambda: self.getJobNumber(1))
         self.buttons.addToJobButton.triggered.connect(lambda: self.getJobNumber(2))
-        self.buttons.callLogButton.triggered.connect(lambda: self.getJobNumber(3))
+        self.buttons.jobsButton.triggered.connect(self.jobs)
         self.buttons.homeButton.triggered.connect(self.startScreen)        
         vertLine = QFrame()
         vertLine.setFrameShape(QFrame.VLine)
@@ -56,7 +56,6 @@ class mainInterface(QWidget):
    
        
     def newJob(self):
-        print("NEW JOB")
         def writeToFile():
             itemData = {}
             itemData['staff'] = jobForm.staffEdit.text()
@@ -72,13 +71,10 @@ class mainInterface(QWidget):
                 itemData['psu'] = "N/A"
             itemData['condition'] = jobForm.condition.text()
             itemData['problem'] = jobForm.problemEdit.toPlainText()
-            print("Passwords",jobForm.passButtonGrp.checkedId())
             if jobForm.passButtonGrp.checkedId() == -2:
-                print("Password Detected")
                 custPasswords =  "Yes"
                 itemData['password'] = jobForm.passwords.toPlainText()
             else:
-                print("No Password")
                 custPasswords = "No"
                 itemData['password'] = ""
 
@@ -97,7 +93,6 @@ class mainInterface(QWidget):
 
         
         def staffEditCheck():
-            print("Staff",jobForm.staffEdit.text())
             if jobForm.staffEdit.text() == "":
                 jobForm.staffVal.error()
                 
@@ -105,14 +100,11 @@ class mainInterface(QWidget):
             else:
                 jobForm.staffVal.tick()
         def itemEditCheck():
-            print("Item Check")
             if jobForm.itemEdit.text() == "":
                 jobForm.itemVal.error()
-                print("Item Error")
                 self.errorsDetected = True
             else:
                 jobForm.itemVal.tick()
-                print("Item PAss")
         def psuButtonCheck():
             if jobForm.psuButtonGroup.checkedId() == -1:
                 jobForm.psuVal.error()
@@ -165,7 +157,6 @@ class mainInterface(QWidget):
             else:
                 jobForm.dataBackupCheckVal.tick()
         def errorChecking():   
-            print("id", jobForm.psuButtonGroup.checkedId())
             errorFunctions = [staffEditCheck, itemEditCheck, psuButtonCheck, 
                                 conditionCheck,problemEditCheck, passwordsBoxCheck,
                                 passwordsCheck, importantDataBoxCheck, 
@@ -173,8 +164,6 @@ class mainInterface(QWidget):
             self.errorsDetected = False
             x=0
             for i in errorFunctions:
-                print(i,x)
-                print("Checking for Errors")
                 if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
                     print ("Passing")
                     x = x+1
@@ -184,12 +173,11 @@ class mainInterface(QWidget):
                     i()
                     x = x+1
                 if self.errorsDetected == True:
-                    self.statusBar.showMessage("Fix Errors")
+                    popup = QMessageBox.critical(self, "Error",
+                            "Fix the marked errors in the form and try again", QMessageBox.Ok)
                     break
                 elif self.errorsDetected == False and x == 10:
-                    print("Writing to File")
                     writeToFile()
-                    print("Job No:", jobForm.jobNoEdit.text())
                     self.personalDeets(jobForm.jobNumber)
         
         def jobNumberGenerator():
@@ -209,7 +197,6 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(jobForm)
    
     def getJobNumber(self, nextFunction):
-        print("nxt Fun", nextFunction)
         searchWidget = findJobWidget(self)
         self.jobSearchTitle = QLabel("Find a Job")
         #self.titleLayout.addWidget(self.jobSearchTitle)
@@ -217,14 +204,18 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(searchWidget)
         def errorChecking():
             print (len(searchWidget.searchField.text()))
-            if len(searchWidget.searchField.text()) == 6:
-                print("success")
+            jobNo = searchWidget.searchField.text()
+            if os.path.isfile("Jobs/Complete/."+str(jobNo)):
+                jobStatus = "Complete"
+            elif os.path.isfile("Jobs/Incomplete/."+str(jobNo)):
+                jobStatus = "Incomplete"
+            else:
+                print("Error")
+            if jobStatus != "":
                 if nextFunction == 1:
-                    self.editJobDetails(int(searchWidget.searchField.text()))
+                    self.editJobDetails(jobNo, jobStatus)
                 elif nextFunction == 2:
-                    self.addToJob(int(searchWidget.searchField.text()))
-                elif nextFunction == 3:
-                    self.jobCalls(int(searchWidget.searchField.text()))
+                    self.addToJob(jobNo, jobStatus)
         searchWidget.searchBtn.clicked.connect(errorChecking)
     def editPersonalDeets(self, jobNum):
         def writeToFile():
@@ -266,8 +257,6 @@ class mainInterface(QWidget):
                 self.phonePresent = False
             else:
                 phoneFull = detailsForm.phoneNo.text().replace(" ","")
-                print("HomePhone",phoneFull)
-                print(phoneFull.isdigit(),phoneFull[0], len(phoneFull))
                 if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
                     detailsForm.phoneVal.tick()
                     self.phonePresent = True
@@ -302,15 +291,13 @@ class mainInterface(QWidget):
             self.errorsDetected = False
             x = 0
             for i in errorFunctions:
-                print(i,x)
                 i()
                 x = x+1
                 if self.errorsDetected == True:
-                    self.statusBar.showMessage("Fix Errors")
-                    print("ERRORS")
+                    popup = QMessageBox.critical(self, "Error",
+                            "Fix the marked errors in the form and try again", QMessageBox.Ok)
                     break
                 elif self.errorsDetected == False and x == 7:
-                    print("WRote")
                     writeToFile()
          
         detailsForm = custDetailForm(False)
@@ -330,7 +317,7 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
          
-    def editJobDetails(self, jobNo):
+    def editJobDetails(self, jobNo, jobStatus):
         def writeToFile():
             itemData = {}
             itemData['staff'] = jobForm.staffEdit.text()
@@ -346,13 +333,10 @@ class mainInterface(QWidget):
                 itemData['psu'] = "N/A"
             itemData['condition'] = jobForm.condition.text()
             itemData['problem'] = jobForm.problemEdit.toPlainText()
-            print("Passwords",jobForm.passButtonGrp.checkedId())
             if jobForm.passButtonGrp.checkedId() == -2:
-                print("Password Detected")
                 custPasswords =  "Yes"
                 itemData['password'] = jobForm.passwords.toPlainText()
             else:
-                print("No Password")
                 custPasswords = "No"
                 itemData['password'] = ""
 
@@ -367,11 +351,9 @@ class mainInterface(QWidget):
                 itemData['backup'] = "Yes"
             else:
                 itemData['backup'] = "No"
-            print("New Items", itemData)
-            pickle.dump(itemData, open("Jobs/Incomplete/."+str(jobNo), "wb"))
+            pickle.dump(itemData, open("Jobs/"+str(jobStatus)+"/."+str(jobNo), "wb"))
             
         def staffEditCheck():
-            print("Staff",jobForm.staffEdit.text())
             if jobForm.staffEdit.text() == "":
                 jobForm.staffVal.error()
                 
@@ -379,14 +361,11 @@ class mainInterface(QWidget):
             else:
                 jobForm.staffVal.tick()
         def itemEditCheck():
-            print("Item Check")
             if jobForm.itemEdit.text() == "":
                 jobForm.itemVal.error()
-                print("Item Error")
                 self.errorsDetected = True
             else:
                 jobForm.itemVal.tick()
-                print("Item PAss")
         def psuButtonCheck():
             if jobForm.psuButtonGroup.checkedId() == -1:
                 jobForm.psuVal.error()
@@ -439,7 +418,6 @@ class mainInterface(QWidget):
             else:
                 jobForm.dataBackupCheckVal.tick()
         def errorChecking():   
-            print("id", jobForm.psuButtonGroup.checkedId())
             errorFunctions = [staffEditCheck, itemEditCheck, psuButtonCheck, 
                                 conditionCheck,problemEditCheck, passwordsBoxCheck,
                                 passwordsCheck, importantDataBoxCheck, 
@@ -447,8 +425,6 @@ class mainInterface(QWidget):
             self.errorsDetected = False
             x=0
             for i in errorFunctions:
-                print(i,x)
-                print("Checking for Errors")
                 if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
                     print ("Passing")
                     x = x+1
@@ -461,12 +437,10 @@ class mainInterface(QWidget):
                     self.statusBar.showMessage("Fix Errors")
                     break
                 elif self.errorsDetected == False and x == 10:
-                    #print("Writing to File")
                     writeToFile()
-                    print("Job No:", jobForm.jobNoEdit.text())
                     self.editPersonalDeets(jobNo)
         jobForm = jobDisplayWidget(int(jobNo))
-        itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), "rb"))
+        itemData = pickle.load(open('Jobs/'+str(jobStatus)+'/.'+str(jobNo), "rb"))
 
         #for line in itemData:
         #    itemData[line] = line.replace("\n","")
@@ -501,7 +475,6 @@ class mainInterface(QWidget):
         jobForm.importantDataChecked()
 
         self.centralWidget.addWidget(jobForm)
-        print("Editing Job",int(jobNo))
         self.centralWidget.setCurrentWidget(jobForm)
         jobForm.nextButton.clicked.connect(lambda: errorChecking())
 
@@ -510,11 +483,12 @@ class mainInterface(QWidget):
         jobForm = jobDisplayWidget(int(jobNo))
                  
     
-    def addToJob(self, jobNo):
+    def addToJob(self, jobNo, jobStatus):
+        self.jobPath = 'Jobs/'+str(jobStatus)+'/.'+str(jobNo)
         def writeToFile():
             #fileReadFrom = open("."+str(jobNo), "r")
             #oldFile = fileReadFrom.readlines()
-            itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), 'rb'))
+            itemData = pickle.load(open(self.jobPath, 'rb'))
             try:
                 for i in jobProgress.removals:
                     del itemData['item'+str(i-1)] #arrayu is 1 infront of items
@@ -525,18 +499,30 @@ class mainInterface(QWidget):
             for i in range(1,len(jobProgress.item)):
                 itemIndex = 'item'+str(x)
                 priceIndex = 'price'+str(x)
-                itemData[itemIndex] = jobProgress.item[i].text()
-                itemData[priceIndex] = jobProgress.price[i].text()
+                try:
+                    itemData[itemIndex] = jobProgress.item[i].text()
+                    itemData[priceIndex] = jobProgress.price[i].text()
+                except KeyError:
+                    pass
                 x += 1 
-
             itemData['jobnotes'] = jobProgress.jobNotesEdit.toPlainText()
-            pickle.dump(itemData, open('Jobs/Incomplete/.'+str(jobNo), "wb"))
+            pickle.dump(itemData, open(self.jobPath, "wb"))
+        def completeJob():
+            if jobProgress.completeBox.isChecked():
+                jobFile = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), 'rb'))
+                os.remove('Jobs/Incomplete/.'+str(jobNo))
+                pickle.dump(itemData, open('Jobs/Complete/.'+str(jobNo), 'wb'))
+                self.jobPath = 'Jobs/Complete/.'+str(jobNo)
+            else:
+                jobFile = pickle.load(open('Jobs/Complete/.'+str(jobNo), 'rb'))
+                os.remove('Jobs/Complete/.'+str(jobNo))
+                pickle.dump(itemData, open('Jobs/Incomplete/.'+str(jobNo), 'wb'))
+                self.jobPath = 'Jobs/Incomplete/.'+str(jobNo)
+
         jobProgress = jobProgressWidget(jobNo)
-        #fileContents = fileReadFrom.readlines()
-        itemData = pickle.load(open('Jobs/Incomplete/.'+str(jobNo), 'rb'))
+        itemData = pickle.load(open(self.jobPath, 'rb'))
         itemCount = 0
         for i in itemData:
-            print(i)
             if 'price' in i: #iteratge price, item is taken
                 i=i[5:] #remove price
                 jobProgress.addItems(itemData['item'+str(i)], itemData['price'+str(i)])
@@ -545,11 +531,14 @@ class mainInterface(QWidget):
         except KeyError:
             pass
         jobProgress.saveButton.clicked.connect(writeToFile)
+        if jobStatus == "Complete":
+            jobProgress.completeBox.setChecked(True)
+        jobProgress.completeBox.stateChanged.connect(completeJob)
+
         self.centralWidget.addWidget(jobProgress)
         self.centralWidget.setCurrentWidget(jobProgress)
     
     def personalDeets(self, jobNum):
-        print("Job 1No:",jobNum)
         def writeToFile():
             custData = {}
             custData['name'] = detailsForm.nameEdit.text()
@@ -588,8 +577,6 @@ class mainInterface(QWidget):
                 self.phonePresent = False
             else:
                 phoneFull = detailsForm.phoneNo.text().replace(" ","")
-                print("HomePhone",phoneFull)
-                print(phoneFull.isdigit(),phoneFull[0], len(phoneFull))
                 if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
                     detailsForm.phoneVal.tick()
                     self.phonePresent = True
@@ -624,15 +611,12 @@ class mainInterface(QWidget):
             self.errorsDetected = False
             x = 0
             for i in errorFunctions:
-                print(i,x)
                 i()
                 x = x+1
                 if self.errorsDetected == True:
                     self.statusBar.showMessage("Fix Errors")
-                    print("ERRORS")
                     break
                 elif self.errorsDetected == False and x == 7:
-                    print("WRote")
                     writeToFile()
                     #self.goHome()
         detailsForm = custDetailForm(True)
@@ -641,10 +625,31 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(detailsForm)
     
     
-    def jobCalls(self, jobNo):
-        callLog = callLogWidget(jobNo)
-        self.centralWidget.addWidget(callLog)
-        self.centralWidget.setCurrentWidget(callLog)
+    def jobs(self):
+        jobWidget = jobsWidget()
+        self.centralWidget.addWidget(jobWidget)
+        self.centralWidget.setCurrentWidget(jobWidget)
+        
+        for i in range(0, jobWidget.rowCount):
+            editButton = QToolButton(self)
+            editButton.setIcon(QIcon.fromTheme("edit-find-replace"))
+            editButton.setIconSize(QSize(32, 32))
+            addToButton = QToolButton(self)
+            addToButton.setIcon(QIcon.fromTheme("story-editor"))
+            addToButton.setIconSize(QSize(32, 32))
+            
+            jobNo = str(jobWidget.jobTable.item(i, 0).text())
+            jobStatus = str(jobWidget.jobTable.item(i, 3).text())
+            editButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.editJobDetails(z,y))
+            addToButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.addToJob(z,y))
+
+            actionWidget = QWidget()
+            actionLayout = QHBoxLayout()
+            actionLayout.addWidget(editButton)
+            actionLayout.addWidget(addToButton)
+            actionWidget.setLayout(actionLayout)
+            jobWidget.jobTable.setCellWidget(i, 4, actionWidget)
+
     
 
 if __name__ == '__main__':
@@ -652,6 +657,3 @@ if __name__ == '__main__':
     ex = mainInterface()
     ex.show()
     sys.exit(app.exec_())
-
-# ah BUGS:
-# Pressing Enter in "Fault: fucks shit up"
