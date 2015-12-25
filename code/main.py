@@ -1,5 +1,6 @@
 # ah BUGS:
-# Pressing Enter in "Fault: fucks shit up"
+#   - Can leave "Add To" Without saving
+#   - 
 import sys
 import os
 import sip
@@ -47,7 +48,11 @@ class mainInterface(QWidget):
         mainLayout.addLayout(centralLayout)
         self.setLayout(mainLayout)
         self.resize(800, 600)
+
+        self.setWindowTitle("Job Tracker")
+        self.setWindowIcon(QIcon.fromTheme("application-rtf"))
         self.startScreen()
+        
 
     def startScreen(self):
         screen = startScreenForm()
@@ -189,6 +194,7 @@ class mainInterface(QWidget):
             jobNoFile.write(str(newJobNum))
             return self.jobNum
 
+        self.buttons.newJobButton.setChecked(True)
         jobForm = jobDisplayWidget(jobNumberGenerator())
         jobForm.nextButton.clicked.connect(errorChecking)
         
@@ -439,6 +445,8 @@ class mainInterface(QWidget):
                 elif self.errorsDetected == False and x == 10:
                     writeToFile()
                     self.editPersonalDeets(jobNo)
+
+        self.buttons.editJobButton.setChecked(True)
         jobForm = jobDisplayWidget(int(jobNo))
         itemData = pickle.load(open('Jobs/'+str(jobStatus)+'/.'+str(jobNo), "rb"))
 
@@ -519,6 +527,7 @@ class mainInterface(QWidget):
                 pickle.dump(itemData, open('Jobs/Incomplete/.'+str(jobNo), 'wb'))
                 self.jobPath = 'Jobs/Incomplete/.'+str(jobNo)
 
+        self.buttons.addToJobButton.setChecked(True)
         jobProgress = jobProgressWidget(jobNo)
         itemData = pickle.load(open(self.jobPath, 'rb'))
         itemCount = 0
@@ -617,8 +626,12 @@ class mainInterface(QWidget):
                     self.statusBar.showMessage("Fix Errors")
                     break
                 elif self.errorsDetected == False and x == 7:
+                    print("SAVED")
                     writeToFile()
                     #self.goHome()
+                    detailsForm.nextButton.setText("Saved")
+                    detailsForm.nextButton.setEnabled(False)
+                    
         detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
         self.centralWidget.addWidget(detailsForm)
@@ -643,17 +656,19 @@ class mainInterface(QWidget):
             editButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.editJobDetails(z,y))
             addToButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.addToJob(z,y))
 
-            actionWidget = QWidget()
-            actionLayout = QHBoxLayout()
-            actionLayout.addWidget(editButton)
-            actionLayout.addWidget(addToButton)
-            actionWidget.setLayout(actionLayout)
-            jobWidget.jobTable.setCellWidget(i, 4, actionWidget)
+            #actionWidget = QWidget()
+            #actionLayout = QHBoxLayout()
+            #actionLayout.addWidget(editButton)
+            #actionLayout.addWidget(addToButton)
+            #actionWidget.setLayout(actionLayout)
+            jobWidget.jobTable.setCellWidget(i, 4, editButton)
+            jobWidget.jobTable.setCellWidget(i, 5, addToButton)
 
     
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = mainInterface()
+
     ex.show()
     sys.exit(app.exec_())

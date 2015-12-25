@@ -133,10 +133,9 @@ class custDetailForm(QWidget):
         addrBox.addLayout(addrLineOneBox)
         addrBox.addLayout(addrLineTwoBox)
 
-        self.nextButton = QToolButton()
-        self.nextButton.setText("Save")
+        self.nextButton = QPushButton("Save")
         self.nextButton.setIcon(QIcon.fromTheme("document-save"))
-        self.nextButton.setToolButtonStyle(4)
+        
 
         nextBox = QHBoxLayout()
         nextBox.addStretch(1)

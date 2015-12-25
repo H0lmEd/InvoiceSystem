@@ -32,8 +32,8 @@ class buttonsWidget(QWidget):
         self.addToJobButton.setCheckable(True)
 
         self.jobsButton = QAction(self)
-        self.jobsButton.setText("Create Invoice")
-        self.jobsButton.setIcon(QIcon.fromTheme("call-start"))
+        self.jobsButton.setText("Existing Jobs")
+        self.jobsButton.setIcon(QIcon.fromTheme("project-open")) #view-process-all
         self.jobsButton.setCheckable(True)
         
         self.toolBar = QToolBar()

@@ -8,8 +8,8 @@ class jobsWidget(QWidget):
         
         layout = QVBoxLayout()
         self.jobTable = QTableWidget()
-        self.jobTable.setColumnCount(5)
-        self.jobTable.setHorizontalHeaderLabels(["Job Number","Customer","Item", "Status", ""])
+        self.jobTable.setColumnCount(6)
+        self.jobTable.setHorizontalHeaderLabels(["Job Number","Customer","Item", "Status", "Edit", "Add To"])
         self.jobTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         compFileList = glob.glob("Jobs/Complete/.1*")
         incompFileList = glob.glob("Jobs/Incomplete/.1*")

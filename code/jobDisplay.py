@@ -133,17 +133,12 @@ class jobDisplayWidget(QWidget):
         self.dataBackupGrp.addButton(self.dataBackupCheckYes)
         self.dataBackupGrp.addButton(self.dataBackupCheckNo)
         
-        testButton = QPushButton("TEST")
-        testButton.setIcon(QIcon.fromTheme("go-next-view"))
-        self.nextButton = QToolButton(self)
-        self.nextButton.setToolButtonStyle(6)
+        self.nextButton = QPushButton("Next")
+        self.nextButton.setIcon(QIcon.fromTheme("gtk-apply"))
         nextButtonLayout = QHBoxLayout()
-        nextButtonLayout.addWidget(testButton)
         nextButtonLayout.addStretch(1)
         nextButtonLayout.addWidget(self.nextButton)
-        self.nextButton.setText("Personal Details")
-        self.nextButton.setIcon(QIcon.fromTheme("go-next-view"))
-        self.nextButton.setIconSize(QSize(12, 12))
+        self.nextButton.setIconSize(QSize(16, 16))
 
       
         titleBox = QGroupBox("New Job")

@@ -1,0 +1,2 @@
+Booked in/Condition: Only a name; no numbers/characters
+Fix array for item 
