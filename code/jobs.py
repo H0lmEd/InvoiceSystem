@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView)
+from PyQt5.QtWidgets import QMessageBox
 import glob
 import pickle
 
@@ -7,6 +8,7 @@ class jobsWidget(QWidget):
         super(jobsWidget, self).__init__(parent)
         
         layout = QVBoxLayout()
+        self.instructions = QLabel("Choose an existing job below to View/Edit, or Add To, or use the buttons on the left to manually use these functions")
         self.jobTable = QTableWidget()
         self.jobTable.setColumnCount(6)
         self.jobTable.setHorizontalHeaderLabels(["Job Number","Customer","Item", "Status", "Edit", "Add To"])
@@ -47,10 +49,14 @@ class jobsWidget(QWidget):
             self.jobTable.setItem(x, 3, compStatus)
 
             x += 1
-            
-   
-        #self.jobTable.setItem(1, 1, test)
+           
+        if len(compFileList) == 0 and len(incompFileList) == 0:
+            self.rowCount = 0
+        
 
+
+        #self.jobTable.setItem(1, 1, test)
+        layout.addWidget(self.instructions)
         layout.addWidget(self.jobTable)
         self.rowCount = x
         self.setLayout(layout)

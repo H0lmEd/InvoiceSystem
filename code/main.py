@@ -12,7 +12,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from findJob import findJobWidget
 from buttons import buttonsWidget
-from startScreen import startScreenForm
 from jobDisplay import jobDisplayWidget
 from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
@@ -32,16 +31,12 @@ class mainInterface(QWidget):
         self.buttons.editJobButton.triggered.connect(lambda: self.getJobNumber(1))
         self.buttons.addToJobButton.triggered.connect(lambda: self.getJobNumber(2))
         self.buttons.jobsButton.triggered.connect(self.jobs)
-        self.buttons.homeButton.triggered.connect(self.startScreen)        
         vertLine = QFrame()
         vertLine.setFrameShape(QFrame.VLine)
         vertLine.setFrameShadow(QFrame.Sunken)
 
-        self.statusBar = QStatusBar(self)
-        self.statusBar.showMessage("Stat")
         
         centralLayout.addWidget(self.centralWidget)
-        centralLayout.addWidget(self.statusBar)
 
         mainLayout.addWidget(self.buttons)
         mainLayout.addWidget(vertLine)
@@ -51,16 +46,12 @@ class mainInterface(QWidget):
 
         self.setWindowTitle("Job Tracker")
         self.setWindowIcon(QIcon.fromTheme("application-rtf"))
-        self.startScreen()
+        self.jobs()
         
 
-    def startScreen(self):
-        screen = startScreenForm()
-        self.centralWidget.addWidget(screen)
-        self.centralWidget.setCurrentWidget(screen)
-   
-       
+           
     def newJob(self):
+        self.buttons.newJobButton.setChecked(True)
         def writeToFile():
             itemData = {}
             itemData['staff'] = jobForm.staffEdit.text()
@@ -204,7 +195,8 @@ class mainInterface(QWidget):
    
     def getJobNumber(self, nextFunction):
         searchWidget = findJobWidget(self)
-        self.jobSearchTitle = QLabel("Find a Job")
+        layout = QVBoxLayout()
+
         #self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
         self.centralWidget.setCurrentWidget(searchWidget)
@@ -217,13 +209,19 @@ class mainInterface(QWidget):
                 jobStatus = "Incomplete"
             else:
                 print("Error")
-            if jobStatus != "":
+            if jobNo != "":
                 if nextFunction == 1:
                     self.editJobDetails(jobNo, jobStatus)
                 elif nextFunction == 2:
                     self.addToJob(jobNo, jobStatus)
+            else: 
+                popup = QMessageBox.critical(self, "Error",
+                            "Job Number invalid or not found, please double check and try again", QMessageBox.Ok)
+
         searchWidget.searchBtn.clicked.connect(errorChecking)
+
     def editPersonalDeets(self, jobNum):
+        self.buttons.editJobButton.setChecked(True)
         def writeToFile():
             custData = {}
             custData['name'] = detailsForm.nameEdit.text()
@@ -240,7 +238,6 @@ class mainInterface(QWidget):
             custData['addrone'] = detailsForm.addrLineOne.text()
             custData['addrtwo'] = detailsForm.addrLineTwo.text()
             
-            self.statusBar.showMessage("Job Details Saved")
             pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
 
         def nameEditCheck():
@@ -324,6 +321,7 @@ class mainInterface(QWidget):
         self.centralWidget.setCurrentWidget(detailsForm)
          
     def editJobDetails(self, jobNo, jobStatus):
+        self.buttons.addToJobButton.setChecked(True)
         def writeToFile():
             itemData = {}
             itemData['staff'] = jobForm.staffEdit.text()
@@ -440,7 +438,6 @@ class mainInterface(QWidget):
                     i()
                     x = x+1
                 if self.errorsDetected == True:
-                    self.statusBar.showMessage("Fix Errors")
                     break
                 elif self.errorsDetected == False and x == 10:
                     writeToFile()
@@ -564,7 +561,6 @@ class mainInterface(QWidget):
             custData['addrone'] = detailsForm.addrLineOne.text()
             custData['addrtwo'] = detailsForm.addrLineTwo.text()
             
-            self.statusBar.showMessage("Job Details Saved")
             pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
         def nameEditCheck():
             if detailsForm.nameEdit.text() == "":
@@ -594,7 +590,7 @@ class mainInterface(QWidget):
         def mobileCheck():
             if detailsForm.mobileNo.text() == "":
                 detailsForm.mobileVal.error()
-                self.errorsDetected = True
+                self.errorsDetected = True #TODO: validate the same as home phone number
             else:
                 detailsForm.mobileVal.tick()
         def pcEditCheck():
@@ -623,7 +619,6 @@ class mainInterface(QWidget):
                 i()
                 x = x+1
                 if self.errorsDetected == True:
-                    self.statusBar.showMessage("Fix Errors")
                     break
                 elif self.errorsDetected == False and x == 7:
                     print("SAVED")
@@ -639,9 +634,12 @@ class mainInterface(QWidget):
     
     
     def jobs(self):
+        self.buttons.jobsButton.setChecked(True)
         jobWidget = jobsWidget()
         self.centralWidget.addWidget(jobWidget)
         self.centralWidget.setCurrentWidget(jobWidget)
+        if jobWidget.rowCount == 0:
+            jobWidget.instructions.setText("No Jobs Found. when jobs are added they will appear here. To add a job, click \"New Job\" from the left side bar")
         
         for i in range(0, jobWidget.rowCount):
             editButton = QToolButton(self)
@@ -663,6 +661,8 @@ class mainInterface(QWidget):
             #actionWidget.setLayout(actionLayout)
             jobWidget.jobTable.setCellWidget(i, 4, editButton)
             jobWidget.jobTable.setCellWidget(i, 5, addToButton)
+
+   
 
     
 

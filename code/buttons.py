@@ -10,12 +10,6 @@ class buttonsWidget(QWidget):
 
         layout = QVBoxLayout()
 
-        self.homeButton = QAction(self)
-        self.homeButton.setText("Start Page")
-        self.homeButton.setIcon(QIcon.fromTheme("go-home"))
-        self.homeButton.setCheckable(True)
-        self.homeButton.setChecked(True)
-
         self.newJobButton = QAction(self)
         self.newJobButton.setText("New Job")
         self.newJobButton.setIcon(QIcon.fromTheme("document-new"))
@@ -35,21 +29,19 @@ class buttonsWidget(QWidget):
         self.jobsButton.setText("Existing Jobs")
         self.jobsButton.setIcon(QIcon.fromTheme("project-open")) #view-process-all
         self.jobsButton.setCheckable(True)
-        
+ 
+ 
         self.toolBar = QToolBar()
         self.toolBar.setMovable(False)
         self.toolBar.setIconSize(QSize(64, 64))
         self.toolBar.setToolButtonStyle(3)
         self.toolBar.setOrientation(0x2)
-        #addToolBar(toolBar)
-        self.toolBar.addAction(self.homeButton)
+        self.toolBar.addAction(self.jobsButton)
         self.toolBar.addAction(self.newJobButton)
         self.toolBar.addAction(self.editJobButton)
         self.toolBar.addAction(self.addToJobButton)
-        self.toolBar.addAction(self.jobsButton)
         
         bGroup = QActionGroup(self)
-        bGroup.addAction(self.homeButton)
         bGroup.addAction(self.newJobButton)
         bGroup.addAction(self.editJobButton)
         bGroup.addAction(self.addToJobButton)

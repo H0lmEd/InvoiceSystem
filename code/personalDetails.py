@@ -37,7 +37,7 @@ class custDetailForm(QWidget):
                 if numberDialog:
                     return str(numberDialog[0])
             try:
-                apiKey = '?api-key=NyymxEPG60eBjmqmqjImRQ2293'
+                apiKey = '?api-key=W9SLQuBlykSwXw1A4oNPOw2705'
                 url = 'https://api.getaddress.io/v2/uk/' + self.pcLineEdit.text() +'/' + getHomeNo()+ apiKey
                 req = urllib.request.Request(url)
                 res = urllib.request.urlopen(req)
