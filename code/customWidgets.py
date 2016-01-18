@@ -42,4 +42,3 @@ class customTableWidget(QTableWidget):
             #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
             #jobProgressWidget.cellWatcher
 
-

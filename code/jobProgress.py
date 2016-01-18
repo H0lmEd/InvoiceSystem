@@ -28,17 +28,8 @@ class jobProgressWidget(QWidget):
         jobTitleBox.setLayout(jobLayout)
         
         self.pound = u'\u00A3'
-        def test():
-            print("Ok")
+        
         partsLabel = QLabel('Parts Used/\nWork Done:')
-        #self.partsTable = customTableWidget()
-        #self.partsTable.setRowCount(1)
-        #self.partsTable.setColumnCount(2)
-        #partsHeaders = ["Item","Cost ExVat"]
-        #self.partsTable.setHorizontalHeaderLabels(partsHeaders)
-        #self.partsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        #self.partsTable.cellChanged.connect(self.updateTotals)
-        #self.partsTable.entered.connect(self.updateTotals)
         itemLabel = QLabel("Item")
         priceLabel = QLabel("Price")
         self.items = 0
@@ -112,8 +103,6 @@ class jobProgressWidget(QWidget):
     def addItems(self, itemContent, priceContent):
         self.items += 1
         x = self.items
-        #itemContent = self.item[0].text()
-        #priceContent = self.price[0].text()
         self.item[0].setText("")
         self.price[0].setText("")
         self.item[x] = QLineEdit(self)
@@ -122,18 +111,15 @@ class jobProgressWidget(QWidget):
         self.price[x] = QLineEdit(self)
         self.price[x].setText(priceContent)
         self.priceLayout.addWidget(self.price[x])
-        #self.buttonColumn.removeWidget(self.addButton)
         
         self.removeButton[x] = QToolButton(self)
         self.removeButton[x].setIcon(QIcon.fromTheme("list-remove"))
         self.removeButton[x].setToolButtonStyle(2)
-        self.removeButton[x].setText(str(x))
         self.removeButton[x].clicked.connect(lambda: self.removeItems(x)) #Deletes previous line, not current
         
         self.buttonLayout[x] = QHBoxLayout()
         self.buttonLayout[x].addWidget(self.removeButton[x])
         self.buttonColumn.addLayout(self.buttonLayout[x])
-        #self.buttonColumn.addWidget(self.addButton)
         self.updateTotals()
     def removeItems(self, x):
         self.removals = []
@@ -151,29 +137,24 @@ class jobProgressWidget(QWidget):
         del self.price[x]
         self.removeButton[x].deleteLater()
         del self.removeButton[x]
-        print("Job Number", self.jobNumber)
         self.items -= 1
-        
-        print("itemLength",len(self.item),"Dict",self.item)
-        
-
-
 
     def updateTotals(self):
         count = 0
         rount = 0
-        totalExVat = float(0.00)
-        taxTotal = float(0.00)
-        total = float(0.00)
+        totalExVat = 0.00
+        taxTotal = 0.00
+        total = 0.00
         for i in range(0, len(self.item)):
             if i == 0:
                 pass
             else:
-                totalExVat = float(totalExVat)+float((self.price[i].text()))
+                totalExVat = totalExVat+float(self.price[i].text())
 
-        totalExVat = float(format(totalExVat, '.2f'))
-        taxTotal = float(format((totalExVat*0.2), '0.2f'))
-        total = float(format((totalExVat*1.2), '0.2f'))
+        totalExVat = format(totalExVat, '.2f')
+        print("totalExVAr",totalExVat)
+        taxTotal = format(float(totalExVat)*0.2, '.2f')
+        total = format(float(totalExVat)*1.2, '.2f')
         
         self.subTotal.setText(self.pound+str(totalExVat))
         self.taxAmount.setText(self.pound+str(taxTotal))

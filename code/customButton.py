@@ -14,7 +14,6 @@ class ButtonLineEdit(QLineEdit):
     def showError(self):
         self.button.setIcon(QIcon(self.errorIconFile))
         self.button.setStyleSheet('border: 0px; padding: 0px;') #No Padding
-        #self.button.setCursor(ArrowCursor)
 
         frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)# Set to label length
         buttonSize = self.button.sizeHint()
@@ -27,7 +26,6 @@ class ButtonLineEdit(QLineEdit):
         print("Ticking")
         self.button.setIcon(QIcon(self.tickIconFile))
         self.button.setStyleSheet('border: 0px; padding: 0px;') #No Padding
-        #self.button.setCursor(ArrowCursor)
 
         frameWidth = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)# Set to label length
         buttonSize = self.button.sizeHint()

@@ -1,12 +1,7 @@
-# ah BUGS:
-#   - Can leave "Add To" Without saving
-#   - 
 import sys
 import os
 import sip
 import pickle
-# PICKLE SHIT UP YO
-# - 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -16,7 +11,6 @@ from jobDisplay import jobDisplayWidget
 from jobProgress import jobProgressWidget
 from personalDetails import custDetailForm
 from jobs import jobsWidget
-#from PyKde4.kdeui import KIcon
 
 
 class mainInterface(QWidget):
@@ -37,7 +31,6 @@ class mainInterface(QWidget):
 
         
         centralLayout.addWidget(self.centralWidget)
-
         mainLayout.addWidget(self.buttons)
         mainLayout.addWidget(vertLine)
         mainLayout.addLayout(centralLayout)
@@ -49,7 +42,6 @@ class mainInterface(QWidget):
         self.jobs()
         
 
-           
     def newJob(self):
         self.buttons.newJobButton.setChecked(True)
         def writeToFile():
@@ -86,7 +78,6 @@ class mainInterface(QWidget):
             else:
                 itemData['backup'] = "No"
             pickle.dump(itemData, open("Jobs/Incomplete/."+str(jobForm.jobNumber), "wb"))
-
         
         def staffEditCheck():
             if jobForm.staffEdit.text() == "":
@@ -447,8 +438,6 @@ class mainInterface(QWidget):
         jobForm = jobDisplayWidget(int(jobNo))
         itemData = pickle.load(open('Jobs/'+str(jobStatus)+'/.'+str(jobNo), "rb"))
 
-        #for line in itemData:
-        #    itemData[line] = line.replace("\n","")
         if 'N/A' in itemData['psu']:
             jobForm.psuNA.setChecked(1)
         elif 'No' in itemData['psu']:
@@ -491,8 +480,6 @@ class mainInterface(QWidget):
     def addToJob(self, jobNo, jobStatus):
         self.jobPath = 'Jobs/'+str(jobStatus)+'/.'+str(jobNo)
         def writeToFile():
-            #fileReadFrom = open("."+str(jobNo), "r")
-            #oldFile = fileReadFrom.readlines()
             itemData = pickle.load(open(self.jobPath, 'rb'))
             try:
                 for i in jobProgress.removals:
@@ -654,16 +641,8 @@ class mainInterface(QWidget):
             editButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.editJobDetails(z,y))
             addToButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.addToJob(z,y))
 
-            #actionWidget = QWidget()
-            #actionLayout = QHBoxLayout()
-            #actionLayout.addWidget(editButton)
-            #actionLayout.addWidget(addToButton)
-            #actionWidget.setLayout(actionLayout)
             jobWidget.jobTable.setCellWidget(i, 4, editButton)
             jobWidget.jobTable.setCellWidget(i, 5, addToButton)
-
-   
-
     
 
 if __name__ == '__main__':
