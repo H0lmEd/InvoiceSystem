@@ -41,7 +41,30 @@ class mainInterface(QWidget):
         self.setWindowIcon(QIcon.fromTheme("application-rtf"))
         self.jobs()
         
+    def jobs(self):
+        self.buttons.jobsButton.setChecked(True)
+        jobWidget = jobsWidget()
+        self.centralWidget.addWidget(jobWidget)
+        self.centralWidget.setCurrentWidget(jobWidget)
+        if jobWidget.rowCount == 0:
+            jobWidget.instructions.setText("No Jobs Found. when jobs are added they will appear here. To add a job, click \"New Job\" from the left side bar")
+        
+        for i in range(0, jobWidget.rowCount):
+            editButton = QToolButton(self)
+            editButton.setIcon(QIcon.fromTheme("edit-find-replace"))
+            editButton.setIconSize(QSize(32, 32))
+            addToButton = QToolButton(self)
+            addToButton.setIcon(QIcon.fromTheme("story-editor"))
+            addToButton.setIconSize(QSize(32, 32))
+            
+            jobNo = str(jobWidget.jobTable.item(i, 0).text())
+            jobStatus = str(jobWidget.jobTable.item(i, 3).text())
+            editButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.editJobDetails(z,y))
+            addToButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.addToJob(z,y))
 
+            jobWidget.jobTable.setCellWidget(i, 4, editButton)
+            jobWidget.jobTable.setCellWidget(i, 5, addToButton)
+            
     def newJob(self):
         self.buttons.newJobButton.setChecked(True)
         def writeToFile():
@@ -152,7 +175,6 @@ class mainInterface(QWidget):
             x=0
             for i in errorFunctions:
                 if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
-                    print ("Passing")
                     x = x+1
                     jobForm.importantDataCheckVal.tick()
                     pass
@@ -165,7 +187,7 @@ class mainInterface(QWidget):
                     break
                 elif self.errorsDetected == False and x == 10:
                     writeToFile()
-                    self.personalDeets(jobForm.jobNumber)
+                    self.personalDetails(jobForm.jobNumber)
         
         def jobNumberGenerator():
             jobNoFile = open('.jobNum', 'r+')
@@ -186,21 +208,18 @@ class mainInterface(QWidget):
    
     def getJobNumber(self, nextFunction):
         searchWidget = findJobWidget(self)
-        layout = QVBoxLayout()
 
-        #self.titleLayout.addWidget(self.jobSearchTitle)
         self.centralWidget.addWidget(searchWidget)
         self.centralWidget.setCurrentWidget(searchWidget)
         def errorChecking():
-            print (len(searchWidget.searchField.text()))
             jobNo = searchWidget.searchField.text()
+            jobStatus = ""
             if os.path.isfile("Jobs/Complete/."+str(jobNo)):
                 jobStatus = "Complete"
             elif os.path.isfile("Jobs/Incomplete/."+str(jobNo)):
                 jobStatus = "Incomplete"
-            else:
-                print("Error")
-            if jobNo != "":
+
+            if jobNo != "" and jobStatus != "":
                 if nextFunction == 1:
                     self.editJobDetails(jobNo, jobStatus)
                 elif nextFunction == 2:
@@ -211,8 +230,7 @@ class mainInterface(QWidget):
 
         searchWidget.searchBtn.clicked.connect(errorChecking)
 
-    def editPersonalDeets(self, jobNum):
-        self.buttons.editJobButton.setChecked(True)
+    def personalDetails(self, jobNum):
         def writeToFile():
             custData = {}
             custData['name'] = detailsForm.nameEdit.text()
@@ -225,12 +243,11 @@ class mainInterface(QWidget):
             else:
                 custData['phone'] = ""
             custData['mobile'] = detailsForm.mobileNo.text()
-            custData['postcode'] = detailsForm.pcEdit.text()
+            custData['postcode'] = detailsForm.pcLineEdit.text()
             custData['addrone'] = detailsForm.addrLineOne.text()
             custData['addrtwo'] = detailsForm.addrLineTwo.text()
             
             pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
-
         def nameEditCheck():
             if detailsForm.nameEdit.text() == "":
                 detailsForm.nameVal.error()
@@ -257,13 +274,15 @@ class mainInterface(QWidget):
                 else:
                     detailsForm.phoneVal.error()
         def mobileCheck():
-            if detailsForm.mobileNo.text() == "":
+            mobileFull = detailsForm.mobileNo.text().replace(" ","")
+            if mobileFull.isdigit() and int(mobileFull[0]) == 0 and len(mobileFull) == 11:
+                detailsForm.mobileVal.tick()
+                self.mobilePresent = True
+            else:
                 detailsForm.mobileVal.error()
                 self.errorsDetected = True
-            else:
-                detailsForm.mobileVal.tick()
         def pcEditCheck():
-            if detailsForm.pcEdit.text() == "": #Different for layout 
+            if detailsForm.pcLineEdit.text() == "":
                 self.errorsDetected = True                
                 detailsForm.pcVal.error()
             else:
@@ -293,24 +312,14 @@ class mainInterface(QWidget):
                     break
                 elif self.errorsDetected == False and x == 7:
                     writeToFile()
-         
-        detailsForm = custDetailForm(False)
-        custData = pickle.load(open('Customers/.'+str(jobNum), 'rb'))
-        detailsForm.nameEdit.setText(custData['name'])
-        if custData['email'] != "":
-            detailsForm.emailAddr.setText(custData['email'])
-        if custData['phone'] != "":
-            detailsForm.phoneNo.setText(custData['phone'])
-        detailsForm.mobileNo.setText(custData['mobile'])
-        detailsForm.pcEdit.setText(custData['postcode'])
-        detailsForm.addrLineOne.setText(custData['addrone'])
-        detailsForm.addrLineTwo.setText(custData['addrtwo'])
+                    detailsForm.nextButton.setText("Saved")
+                    detailsForm.nextButton.setEnabled(False)
+                    
+        detailsForm = custDetailForm(True)
         detailsForm.nextButton.clicked.connect(errorChecking)
-        detailsForm.addrLineOne.setReadOnly(False)
-        detailsForm.addrLineTwo.setReadOnly(False)
         self.centralWidget.addWidget(detailsForm)
         self.centralWidget.setCurrentWidget(detailsForm)
-         
+
     def editJobDetails(self, jobNo, jobStatus):
         self.buttons.addToJobButton.setChecked(True)
         def writeToFile():
@@ -421,7 +430,6 @@ class mainInterface(QWidget):
             x=0
             for i in errorFunctions:
                 if (x == 8 and jobForm.importantDataGrp.checkedId() != -2) or (x == 6 and jobForm.passButtonGrp.checkedId() != -2):
-                    print ("Passing")
                     x = x+1
                     jobForm.importantDataCheckVal.tick()
                     pass
@@ -429,10 +437,12 @@ class mainInterface(QWidget):
                     i()
                     x = x+1
                 if self.errorsDetected == True:
+                    popup = QMessageBox.critical(self, "Error",
+                            "Fix the marked errors in the form and try again", QMessageBox.Ok)
                     break
                 elif self.errorsDetected == False and x == 10:
                     writeToFile()
-                    self.editPersonalDeets(jobNo)
+                    self.editPersonalDetails(jobNo)
 
         self.buttons.editJobButton.setChecked(True)
         jobForm = jobDisplayWidget(int(jobNo))
@@ -471,12 +481,110 @@ class mainInterface(QWidget):
         self.centralWidget.addWidget(jobForm)
         self.centralWidget.setCurrentWidget(jobForm)
         jobForm.nextButton.clicked.connect(lambda: errorChecking())
-
-        
-    def jobDisplayErrorChecking(self, jobNo):
-        jobForm = jobDisplayWidget(int(jobNo))
-                 
     
+
+    def editPersonalDetails(self, jobNum):
+        self.buttons.editJobButton.setChecked(True)
+        def writeToFile():
+            custData = {}
+            custData['name'] = detailsForm.nameEdit.text()
+            if self.emailPresent:
+                custData['email'] = detailsForm.emailAddr.text()
+            else:
+                custData['email'] = ""
+            if self.phonePresent:
+                custData['phone'] = detailsForm.phoneNo.text()
+            else:
+                custData['phone'] = ""
+            custData['mobile'] = detailsForm.mobileNo.text()
+            custData['postcode'] = detailsForm.pcEdit.text()
+            custData['addrone'] = detailsForm.addrLineOne.text()
+            custData['addrtwo'] = detailsForm.addrLineTwo.text()
+            
+            pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
+
+        def nameEditCheck():
+            if detailsForm.nameEdit.text() == "":
+                detailsForm.nameVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.nameVal.tick()
+        def emailCheck():
+            if detailsForm.emailAddr.text() == "":
+                self.emailPresent = False
+            elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
+                detailsForm.emailVal.tick()
+                self.emailPresent = True
+            else:
+                detailsForm.emailVal.error()
+                self.errorsDetected = True
+        def phoneCheck():
+            if detailsForm.phoneNo.text() == "":
+                self.phonePresent = False
+            else:
+                phoneFull = detailsForm.phoneNo.text().replace(" ","")
+                if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
+                    detailsForm.phoneVal.tick()
+                    self.phonePresent = True
+                else:
+                    detailsForm.phoneVal.error()
+        def mobileCheck():
+            print("ddeta", detailsForm.mobileNo.text())
+            if detailsForm.mobileNo.text() == "":
+                detailsForm.mobileVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.mobileVal.tick()
+        def pcEditCheck():
+            if detailsForm.pcEdit.text() == "": #Different for layout 
+                self.errorsDetected = True                
+                detailsForm.pcVal.error()
+            else:
+                detailsForm.pcVal.tick()
+        def addrOneCheck():
+            if detailsForm.addrLineOne.text() == "":
+                detailsForm.addrLineOneVal.error()
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineOneVal.tick()
+        def addrTwoCheck():
+            if detailsForm.addrLineTwoVal.error():
+                self.errorsDetected = True
+            else:
+                detailsForm.addrLineTwoVal.tick()
+        def errorChecking():
+            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, mobileCheck,
+                                pcEditCheck, addrOneCheck, addrTwoCheck]
+            self.errorsDetected = False
+            x = 0
+            for i in errorFunctions:
+                i()
+                x = x+1
+                if self.errorsDetected == True:
+                    popup = QMessageBox.critical(self, "Error",
+                            "Fix the marked errors in the form and try again", QMessageBox.Ok)
+                    break
+                elif self.errorsDetected == False and x == 7:
+                    writeToFile()
+         
+        detailsForm = custDetailForm(False)
+        custData = pickle.load(open('Customers/.'+str(jobNum), 'rb'))
+        detailsForm.nameEdit.setText(custData['name'])
+        if custData['email'] != "":
+            detailsForm.emailAddr.setText(custData['email'])
+        if custData['phone'] != "":
+            detailsForm.phoneNo.setText(custData['phone'])
+        detailsForm.mobileNo.setText(custData['mobile'])
+        detailsForm.pcEdit.setText(custData['postcode'])
+        detailsForm.addrLineOne.setText(custData['addrone'])
+        detailsForm.addrLineTwo.setText(custData['addrtwo'])
+        detailsForm.nextButton.clicked.connect(errorChecking)
+        detailsForm.addrLineOne.setReadOnly(False)
+        detailsForm.addrLineTwo.setReadOnly(False)
+        self.centralWidget.addWidget(detailsForm)
+        self.centralWidget.setCurrentWidget(detailsForm)
+         
+
     def addToJob(self, jobNo, jobStatus):
         self.jobPath = 'Jobs/'+str(jobStatus)+'/.'+str(jobNo)
         def writeToFile():
@@ -530,120 +638,6 @@ class mainInterface(QWidget):
 
         self.centralWidget.addWidget(jobProgress)
         self.centralWidget.setCurrentWidget(jobProgress)
-    
-    def personalDeets(self, jobNum):
-        def writeToFile():
-            custData = {}
-            custData['name'] = detailsForm.nameEdit.text()
-            if self.emailPresent:
-                custData['email'] = detailsForm.emailAddr.text()
-            else:
-                custData['email'] = ""
-            if self.phonePresent:
-                custData['phone'] = detailsForm.phoneNo.text()
-            else:
-                custData['phone'] = ""
-            custData['mobile'] = detailsForm.mobileNo.text()
-            custData['postcode'] = detailsForm.pcLineEdit.text()
-            custData['addrone'] = detailsForm.addrLineOne.text()
-            custData['addrtwo'] = detailsForm.addrLineTwo.text()
-            
-            pickle.dump(custData, open("Customers/."+str(jobNum), "wb"))               
-        def nameEditCheck():
-            if detailsForm.nameEdit.text() == "":
-                detailsForm.nameVal.error()
-                self.errorsDetected = True
-            else:
-                detailsForm.nameVal.tick()
-        def emailCheck():
-            if detailsForm.emailAddr.text() == "":
-                self.emailPresent = False
-            elif "@" in detailsForm.emailAddr.text() and "." in detailsForm.emailAddr.text():
-                detailsForm.emailVal.tick()
-                self.emailPresent = True
-            else:
-                detailsForm.emailVal.error()
-                self.errorsDetected = True
-        def phoneCheck():
-            if detailsForm.phoneNo.text() == "":
-                self.phonePresent = False
-            else:
-                phoneFull = detailsForm.phoneNo.text().replace(" ","")
-                if phoneFull.isdigit() and int(phoneFull[0]) == 0 and len(phoneFull) == 11:
-                    detailsForm.phoneVal.tick()
-                    self.phonePresent = True
-                else:
-                    detailsForm.phoneVal.error()
-        def mobileCheck():
-            if detailsForm.mobileNo.text() == "":
-                detailsForm.mobileVal.error()
-                self.errorsDetected = True #TODO: validate the same as home phone number
-            else:
-                detailsForm.mobileVal.tick()
-        def pcEditCheck():
-            if detailsForm.pcLineEdit.text() == "":
-                self.errorsDetected = True                
-                detailsForm.pcVal.error()
-            else:
-                detailsForm.pcVal.tick()
-        def addrOneCheck():
-            if detailsForm.addrLineOne.text() == "":
-                detailsForm.addrLineOneVal.error()
-                self.errorsDetected = True
-            else:
-                detailsForm.addrLineOneVal.tick()
-        def addrTwoCheck():
-            if detailsForm.addrLineTwoVal.error():
-                self.errorsDetected = True
-            else:
-                detailsForm.addrLineTwoVal.tick()
-        def errorChecking():
-            errorFunctions = [nameEditCheck, emailCheck, phoneCheck, mobileCheck,
-                                pcEditCheck, addrOneCheck, addrTwoCheck]
-            self.errorsDetected = False
-            x = 0
-            for i in errorFunctions:
-                i()
-                x = x+1
-                if self.errorsDetected == True:
-                    break
-                elif self.errorsDetected == False and x == 7:
-                    print("SAVED")
-                    writeToFile()
-                    #self.goHome()
-                    detailsForm.nextButton.setText("Saved")
-                    detailsForm.nextButton.setEnabled(False)
-                    
-        detailsForm = custDetailForm(True)
-        detailsForm.nextButton.clicked.connect(errorChecking)
-        self.centralWidget.addWidget(detailsForm)
-        self.centralWidget.setCurrentWidget(detailsForm)
-    
-    
-    def jobs(self):
-        self.buttons.jobsButton.setChecked(True)
-        jobWidget = jobsWidget()
-        self.centralWidget.addWidget(jobWidget)
-        self.centralWidget.setCurrentWidget(jobWidget)
-        if jobWidget.rowCount == 0:
-            jobWidget.instructions.setText("No Jobs Found. when jobs are added they will appear here. To add a job, click \"New Job\" from the left side bar")
-        
-        for i in range(0, jobWidget.rowCount):
-            editButton = QToolButton(self)
-            editButton.setIcon(QIcon.fromTheme("edit-find-replace"))
-            editButton.setIconSize(QSize(32, 32))
-            addToButton = QToolButton(self)
-            addToButton.setIcon(QIcon.fromTheme("story-editor"))
-            addToButton.setIconSize(QSize(32, 32))
-            
-            jobNo = str(jobWidget.jobTable.item(i, 0).text())
-            jobStatus = str(jobWidget.jobTable.item(i, 3).text())
-            editButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.editJobDetails(z,y))
-            addToButton.clicked.connect(lambda sacrafice="", z=jobNo, y=jobStatus: self.addToJob(z,y))
-
-            jobWidget.jobTable.setCellWidget(i, 4, editButton)
-            jobWidget.jobTable.setCellWidget(i, 5, addToButton)
-    
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
