@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel,
-        QCheckBox, QTextEdit, QPushButton, QVBoxLayout, QGroupBox, QLineEdit)
-from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QToolButton
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from customWidgets import validationImage
 import os
 
@@ -31,7 +30,6 @@ class jobDisplayWidget(QWidget):
         
         itemLabel = QLabel('Items:')
         self.itemEdit = QLineEdit(self)
-        self.itemEdit.setClearButtonEnabled(True)
         self.itemVal = validationImage(self)
         self.itemBox = QHBoxLayout()
         self.itemBox.addWidget(self.itemEdit)
@@ -118,7 +116,7 @@ class jobDisplayWidget(QWidget):
         self.importantDataGrp = QButtonGroup(self)
         self.importantDataGrp.addButton(self.importantDataCheckYes)
         self.importantDataGrp.addButton(self.importantDataCheckNo)
-
+#hwerwer
         dataBackupLabel = QLabel('Important Data Backed up:')
         self.dataBackupCheckYes = QCheckBox('Yes', self)
         self.dataBackupCheckNo = QCheckBox('No', self)
@@ -170,4 +168,4 @@ class jobDisplayWidget(QWidget):
         if self.passButtonGrp.checkedId() == -2:
             self.passwords.setReadOnly(False)
         elif self.passButtonGrp.checkedId() == -3:
-            self.passwords.setReadOnly(Trie)
+            self.passwords.setReadOnly(True)

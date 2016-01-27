@@ -1,22 +1,10 @@
 # When customer is new, pcEdit = Box layout of label + button
 # When customer isnt new, pcEdit = QLineEdit
-
-
-
-
-
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QFormLayout, QLabel, QLineEdit,
-                                QCheckBox, QTextEdit, QPushButton)
-from PyQt5.QtWidgets import QButtonGroup, QInputDialog, QMessageBox, QVBoxLayout, QToolButton, QStyle, QGroupBox
-from PyQt5.QtCore import QSize,pyqtSignal
-from PyQt5.QtGui import QIcon
-#from customButton import QLineEdit
-from customWidgets import validationImage
-import json
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from customWidgets import *
 import os
-import PyQt5.QtGui
-import PyQt5.QtCore
-import PyQt5.QtWidgets
 import urllib
 import requests
 
@@ -31,7 +19,6 @@ class custDetailForm(QWidget):
                 numberData = QInputDialog()
                 numberData.setInputMode(2)
                 print(numberData.inputMode())
-                numberData.setComboBoxEditable(True)
                 numberDialog = numberData.getText(self, "Home Number",
                         "Home Number:")
                 if numberDialog:

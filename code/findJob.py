@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt5.QtWidgets import *
 
 class findJobWidget(QWidget):
     def __init__(self, parent=None):

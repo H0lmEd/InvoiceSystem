@@ -1,9 +1,6 @@
-from PyQt5.QtWidgets import (QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QTableWidget,
-        QLabel, QLineEdit, QTextEdit, QPushButton, QDesktopWidget, QHeaderView, QHBoxLayout,
-        QGroupBox, QMessageBox, QToolButton, QCheckBox)
-from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtGui import QIcon
-from customWidgets import customTableWidget
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import pickle
 class jobProgressWidget(QWidget):
     def __init__(self, jobNumber, parent=None):

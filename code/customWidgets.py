@@ -24,21 +24,3 @@ class validationImage(QWidget):
         self.layout.addWidget(self.label)
         self.setLayout(self.layout)
 
-class customTableWidget(QTableWidget):
-    def __init__(self):
-        QTableWidget.__init__(self)
-        entered = pyqtSignal()
-    
-    def keyPressEvent(self, event):
-        print(event.key())
-        if event.key() == 16777220:
-            print("ENTER PRESSED")
-            newRow = int(super().currentRow()) + 1
-            super().insertRow(newRow)
-            super().setCurrentCell((super().currentRow()+1), 0)
-            print('Signal soon to be Emitted')
-            #super.entered = pyqtSignal()
-            self.entered.emit()
-            #jobProgressWidget.rowNumber = jobProgressWidget.rowNumber+1
-            #jobProgressWidget.cellWatcher
-

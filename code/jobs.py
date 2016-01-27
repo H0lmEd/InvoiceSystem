@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView)
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import *
 import glob
 import pickle
 
@@ -18,9 +18,7 @@ class jobsWidget(QWidget):
 
         x = 0
         for i in incompFileList:
-
             self.jobTable.insertRow(x)
-            
             incompStatus = QTableWidgetItem("Incomplete")
             jobNo = i.replace("Jobs/Incomplete/.", "")
             jobNoWidget = QTableWidgetItem(jobNo)
@@ -47,12 +45,8 @@ class jobsWidget(QWidget):
             self.jobTable.setItem(x, 1, name)
             self.jobTable.setItem(x, 2, items)
             self.jobTable.setItem(x, 3, compStatus)
-
             x += 1
-           
-        if len(compFileList) == 0 and len(incompFileList) == 0:
-            self.rowCount = 0
-        
+
 
 
         #self.jobTable.setItem(1, 1, test)
