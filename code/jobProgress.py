@@ -8,6 +8,14 @@ class jobProgressWidget(QWidget):
         self.jobNumber = jobNumber
         layout = QHBoxLayout()
 
+        def priceValidation(item,price):
+            try:
+                test = float(price)
+                self.addItems(item,price)
+            except ValueError:
+                popup = QMessageBox.critical(self, "Error",
+                        "Please check the prices and try again", QMessageBox.Ok)
+
         jobNoLabel = QLabel('Job Number:')
         jobNoEdit = QLineEdit(self)
         jobNoEdit.setReadOnly(True)
@@ -36,7 +44,7 @@ class jobProgressWidget(QWidget):
         self.price[0] = QLineEdit(self)
         self.addButton = QToolButton(self)
         self.addButton.setIcon(QIcon.fromTheme("list-add"))
-        self.addButton.clicked.connect(lambda: self.addItems(self.item[0].text(), self.price[0].text()))
+        self.addButton.clicked.connect(lambda: priceValidation(self.item[0].text(), self.price[0].text()))
         self.priceLayout = QVBoxLayout()
         self.priceLayout.addWidget(priceLabel)
         self.priceLayout.addWidget(self.price[0])
